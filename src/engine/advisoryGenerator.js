@@ -112,10 +112,12 @@ export function generateAdvisory({
   // === Irrigation recommendation ===
   advisory.irrigationDepth = wbSummary.irrigationNeeded;
   if (advisory.irrigationDepth > 0) {
+    const grossDrip = Math.round((advisory.irrigationDepth / 0.90) * 10) / 10;
+    const grossFlood = Math.round((advisory.irrigationDepth / 0.65) * 10) / 10;
     advisory.irrigationAdvice =
-      `Apply approximately ${advisory.irrigationDepth} mm of irrigation to bring soil moisture back to field capacity.`;
+      `Net root-zone deficit: ${advisory.irrigationDepth} mm. Recommended gross application: ~${grossDrip} mm (Drip @ 90% eff.) or ~${grossFlood} mm (Surface/Flood @ 65% eff.) to restore field capacity.`;
   } else {
-    advisory.irrigationAdvice = 'No irrigation needed — soil moisture is at or above field capacity.';
+    advisory.irrigationAdvice = 'No irrigation needed — root-zone soil moisture is at or above field capacity.';
   }
 
   // === Yield loss ===

@@ -352,8 +352,12 @@ export function getCurrentGrowthStage(cropId, plantingDate, currentDate) {
 }
 
 /**
- * Get interpolated Kc for a given day in the season.
- * Linear interpolation between growth stage Kc values.
+ * Get interpolated Kc for a given day in the season following exact FAO-56 Figure 27.
+ * - Initial stage: flat at Kc_ini
+ * - Development stage: linear ramp from Kc_ini to Kc_mid
+ * - Mid-season stage: flat at Kc_mid
+ * - Late-season stage: linear ramp from Kc_mid to Kc_end
+ * 
  * @param {string} cropId 
  * @param {number} daysIntoSeason 
  * @returns {number}
@@ -362,45 +366,32 @@ export function getKcForDay(cropId, daysIntoSeason) {
   const crop = CROPS[cropId];
   if (!crop) return 1.0;
 
-  const stages = [
-    GROWTH_STAGES.INITIAL,
-    GROWTH_STAGES.DEVELOPMENT,
-    GROWTH_STAGES.MID_SEASON,
-    GROWTH_STAGES.LATE_SEASON,
-  ];
+  const lIni = crop.stageDuration[GROWTH_STAGES.INITIAL];
+  const lDev = crop.stageDuration[GROWTH_STAGES.DEVELOPMENT];
+  const lMid = crop.stageDuration[GROWTH_STAGES.MID_SEASON];
+  const lLate = crop.stageDuration[GROWTH_STAGES.LATE_SEASON];
 
-  // Build breakpoints: midpoints of each stage
-  const breakpoints = [];
-  let cumDays = 0;
-  for (const stage of stages) {
-    const dur = crop.stageDuration[stage];
-    const midpoint = cumDays + dur / 2;
-    breakpoints.push({ day: midpoint, kc: crop.kc[stage] });
-    cumDays += dur;
+  const kcIni = crop.kc[GROWTH_STAGES.INITIAL];
+  const kcMid = crop.kc[GROWTH_STAGES.MID_SEASON];
+  const kcEnd = crop.kc[GROWTH_STAGES.LATE_SEASON];
+
+  if (daysIntoSeason <= lIni) {
+    return kcIni;
+  } else if (daysIntoSeason <= lIni + lDev) {
+    const t = (daysIntoSeason - lIni) / lDev;
+    return kcIni + t * (kcMid - kcIni);
+  } else if (daysIntoSeason <= lIni + lDev + lMid) {
+    return kcMid;
+  } else if (daysIntoSeason <= lIni + lDev + lMid + lLate) {
+    const t = (daysIntoSeason - (lIni + lDev + lMid)) / lLate;
+    return kcMid + t * (kcEnd - kcMid);
+  } else {
+    return kcEnd;
   }
-
-  if (daysIntoSeason <= breakpoints[0].day) return breakpoints[0].kc;
-  if (daysIntoSeason >= breakpoints[breakpoints.length - 1].day)
-    return breakpoints[breakpoints.length - 1].kc;
-
-  // Linear interpolation
-  for (let i = 0; i < breakpoints.length - 1; i++) {
-    if (
-      daysIntoSeason >= breakpoints[i].day &&
-      daysIntoSeason <= breakpoints[i + 1].day
-    ) {
-      const t =
-        (daysIntoSeason - breakpoints[i].day) /
-        (breakpoints[i + 1].day - breakpoints[i].day);
-      return breakpoints[i].kc + t * (breakpoints[i + 1].kc - breakpoints[i].kc);
-    }
-  }
-
-  return 1.0;
 }
 
 /**
- * Get expected NDVI for a given day in the season (for cross-validation).
+ * Get expected NDVI for a given day in the season (FAO-56 phenological canopy curve).
  * @param {string} cropId 
  * @param {number} daysIntoSeason 
  * @returns {number}
@@ -409,42 +400,28 @@ export function getExpectedNDVI(cropId, daysIntoSeason) {
   const crop = CROPS[cropId];
   if (!crop) return 0.5;
 
-  const stages = [
-    GROWTH_STAGES.INITIAL,
-    GROWTH_STAGES.DEVELOPMENT,
-    GROWTH_STAGES.MID_SEASON,
-    GROWTH_STAGES.LATE_SEASON,
-  ];
+  const lIni = crop.stageDuration[GROWTH_STAGES.INITIAL];
+  const lDev = crop.stageDuration[GROWTH_STAGES.DEVELOPMENT];
+  const lMid = crop.stageDuration[GROWTH_STAGES.MID_SEASON];
+  const lLate = crop.stageDuration[GROWTH_STAGES.LATE_SEASON];
 
-  const breakpoints = [];
-  let cumDays = 0;
-  for (const stage of stages) {
-    const dur = crop.stageDuration[stage];
-    const midpoint = cumDays + dur / 2;
-    breakpoints.push({ day: midpoint, ndvi: crop.ndviExpected[stage] });
-    cumDays += dur;
+  const ndviIni = crop.ndviExpected[GROWTH_STAGES.INITIAL];
+  const ndviMid = crop.ndviExpected[GROWTH_STAGES.MID_SEASON];
+  const ndviEnd = crop.ndviExpected[GROWTH_STAGES.LATE_SEASON];
+
+  if (daysIntoSeason <= lIni) {
+    return ndviIni;
+  } else if (daysIntoSeason <= lIni + lDev) {
+    const t = (daysIntoSeason - lIni) / lDev;
+    return ndviIni + t * (ndviMid - ndviIni);
+  } else if (daysIntoSeason <= lIni + lDev + lMid) {
+    return ndviMid;
+  } else if (daysIntoSeason <= lIni + lDev + lMid + lLate) {
+    const t = (daysIntoSeason - (lIni + lDev + lMid)) / lLate;
+    return ndviMid + t * (ndviEnd - ndviMid);
+  } else {
+    return ndviEnd;
   }
-
-  if (daysIntoSeason <= breakpoints[0].day) return breakpoints[0].ndvi;
-  if (daysIntoSeason >= breakpoints[breakpoints.length - 1].day)
-    return breakpoints[breakpoints.length - 1].ndvi;
-
-  for (let i = 0; i < breakpoints.length - 1; i++) {
-    if (
-      daysIntoSeason >= breakpoints[i].day &&
-      daysIntoSeason <= breakpoints[i + 1].day
-    ) {
-      const t =
-        (daysIntoSeason - breakpoints[i].day) /
-        (breakpoints[i + 1].day - breakpoints[i].day);
-      return (
-        breakpoints[i].ndvi +
-        t * (breakpoints[i + 1].ndvi - breakpoints[i].ndvi)
-      );
-    }
-  }
-
-  return 0.5;
 }
 
 /**

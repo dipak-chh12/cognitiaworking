@@ -105,7 +105,7 @@ export async function fetchWeatherData(lat, lng, startDate, forecastDays = 7) {
 
   return {
     data,
-    source: 'Open-Meteo (open-meteo.com)',
+    source: 'Open-Meteo FAO-56 Penman-Monteith Grid (open-meteo.com)',
     warnings,
   };
 }
@@ -184,11 +184,12 @@ function generateClimateFallback(lat, startDate) {
   let current = new Date(start);
   while (current < today) {
     const month = current.getMonth();
+    const dayOfYear = Math.floor((current - new Date(current.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
     const dailyPrecip = monthlyPrecip[month] / 30;
-    const et0 = estimateET0(lat, month);
+    const et0 = estimateET0Hargreaves(lat, dayOfYear);
 
     const precipVariation = 0.7 + Math.random() * 0.6;
-    const et0Variation = 0.85 + Math.random() * 0.3;
+    const et0Variation = 0.90 + Math.random() * 0.2;
 
     data.push({
       date: current.toISOString().split('T')[0],
@@ -241,10 +242,29 @@ function getClimateNormals(lat) {
   }
 }
 
-function estimateET0(lat, month) {
-  const absLat = Math.abs(lat);
-  const isSummer = (lat >= 0 && month >= 4 && month <= 8) || (lat < 0 && (month <= 2 || month >= 10));
-  if (absLat < 20) return isSummer ? 5.5 : 4.2;
-  if (absLat < 35) return isSummer ? 6.5 : 3.0;
-  return isSummer ? 5.0 : 1.8;
+/**
+ * FAO-56 Eq. 52 Extraterrestrial Radiation Ra approximation (Hargreaves-Samani).
+ * @param {number} lat - Latitude in degrees
+ * @param {number} J - Day of year (1-365)
+ * @returns {number} Estimated daily ET0 in mm/day
+ */
+function estimateET0Hargreaves(lat, J) {
+  const phi = (lat * Math.PI) / 180;
+  const dr = 1 + 0.033 * Math.cos((2 * Math.PI * J) / 365);
+  const delta = 0.409 * Math.sin(((2 * Math.PI * J) / 365) - 1.39);
+  const tanTan = -Math.tan(phi) * Math.tan(delta);
+  const omegaS = Math.acos(Math.max(-1, Math.min(1, tanTan)));
+
+  // Extraterrestrial radiation Ra in MJ/m2/day (FAO-56 Eq. 21)
+  const Gsc = 0.0820; // Solar constant MJ/m2/min
+  const Ra = (24 * 60 / Math.PI) * Gsc * dr * (
+    omegaS * Math.sin(phi) * Math.sin(delta) +
+    Math.cos(phi) * Math.cos(delta) * Math.sin(omegaS)
+  );
+
+  // Convert Ra to equivalent evaporation depth in mm/day (divide by lambda = 2.45 MJ/kg)
+  const Ra_mm = Ra / 2.45;
+  // Standard temperature index estimate (Tmean ~ 24°C, deltaT ~ 12°C)
+  const et0 = 0.0023 * (24 + 17.8) * Math.sqrt(12) * Ra_mm;
+  return Math.max(1.0, Math.min(9.5, et0));
 }
