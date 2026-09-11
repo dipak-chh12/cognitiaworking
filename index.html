@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Physics-based crop water stress engine with satellite cross-validation. Provides actionable irrigate/wait recommendations and yield-loss estimates for farmers." />
+  <title>COGNITIA — Your Field. Smarter Decisions.</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin="" />
+
+  <!-- Leaflet Draw CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="loading-screen">
+    <div class="loading-content">
+      <div class="loading-icon">
+        <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+          <circle cx="28" cy="28" r="24" stroke="url(#lg1)" stroke-width="3" stroke-dasharray="120 50" class="loading-ring" />
+          <path d="M28 14 C 18 22, 18 38, 28 46 C 38 38, 38 22, 28 14Z" fill="#1a7a42" class="loading-drop"/>
+          <path d="M25 27 L 22 33 L 28 30 L 32 24 L 25 27Z" fill="#fff"/>
+          <defs>
+            <linearGradient id="lg1" x1="0" y1="0" x2="56" y2="56">
+              <stop offset="0%" stop-color="#1a7a42"/>
+              <stop offset="100%" stop-color="#2ecc71"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h2 class="loading-title">COGNITIA</h2>
+      <p class="loading-subtitle">Initializing field analysis engine...</p>
+    </div>
+  </div>
+
+  <!-- Disclaimer Modal -->
+  <div id="disclaimer-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+      <div class="modal-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#e67e22" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <h3>Important Disclaimer</h3>
+      <div class="modal-body">
+        <p>COGNITIA gives helpful advice based on weather, soil and satellite data. It is <strong>not a substitute</strong> for your own experience or expert advice.</p>
+        <ul>
+          <li>Recommendations should be validated against field conditions.</li>
+          <li>Yield-loss estimates are indicative, based on FAO models.</li>
+          <li>Data accuracy varies by location and season.</li>
+        </ul>
+        <p class="modal-sources">Data: Open-Meteo · ISRIC SoilGrids · NASA MODIS (ORNL DAAC TESViS)</p>
+      </div>
+      <button id="disclaimer-accept" class="btn-primary-full">
+        I Understand — Continue
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== MAIN APP ===== -->
+  <div id="app">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <div class="brand">
+          <svg class="brand-leaf" width="36" height="36" viewBox="0 0 56 56" fill="none">
+            <path d="M28 6 C 12 18, 12 42, 28 52 C 44 42, 44 18, 28 6Z" fill="#1a7a42"/>
+            <path d="M24 24 L 20 34 L 28 30 L 34 20 L 24 24Z" fill="#fff"/>
+          </svg>
+          <div>
+            <span class="brand-name">COGNITIA</span>
+            <span class="brand-sub">Your Field. Smarter Decisions.</span>
+          </div>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="#" class="nav-link active"><span class="nav-icon">🏠</span> Home</a>
+        <a href="#" id="nav-my-fields" class="nav-link"><span class="nav-icon">🌾</span> My Fields</a>
+        <a href="#" class="nav-link"><span class="nav-icon">🔍</span> Check Field</a>
+        <a href="#" class="nav-link"><span class="nav-icon">❓</span> Help</a>
+      </nav>
+      <div class="header-right">
+        <div class="neon-indicator" id="neon-status-badge" title="Connected to Neon Serverless PostgreSQL">
+          <span class="neon-dot"></span>
+          <span>Neon DB</span>
+        </div>
+        <div class="lang-select">
+          <span>🌐</span>
+          <span>English</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="avatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+      <!-- Left: Map Panel -->
+      <aside class="map-panel">
+        <!-- Search Bar -->
+        <div class="map-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="search-input" placeholder="Search village, district, or PIN code..." />
+          <button id="locate-btn" class="locate-btn" title="Use my location">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a7a42" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/><circle cx="12" cy="12" r="3" fill="#1a7a42" stroke="none"/></svg>
+          </button>
+        </div>
+
+        <!-- Location Name Strip -->
+        <div class="map-location-badge" id="map-location-badge">
+          <span class="loc-pin">📍</span>
+          <span class="loc-text" id="loc-name-text">Loading location name...</span>
+        </div>
+
+        <!-- Quick Demo Presets -->
+        <div class="map-presets">
+          <span class="presets-title">Presets:</span>
+          <button class="preset-pill active" data-lat="30.55" data-lng="76.45" data-crop="wheat" data-name="Punjab Wheat Field">🌾 Punjab</button>
+          <button class="preset-pill" data-lat="19.75" data-lng="75.71" data-crop="sugarcane" data-name="Maharashtra Cane">🎋 MH</button>
+          <button class="preset-pill" data-lat="21.52" data-lng="70.45" data-crop="groundnut" data-name="Gujarat Groundnut">🥜 GJ</button>
+          <button class="preset-pill" data-lat="42.03" data-lng="-93.63" data-crop="maize" data-name="Iowa Corn Belt">🌽 US</button>
+        </div>
+
+        <!-- Map Wrap with Floating Overlays -->
+        <div class="map-wrapper">
+          <div id="map" class="map-container"></div>
+          
+          <!-- Floating Draw Instructions Badge -->
+          <div id="draw-instruction-badge" class="draw-instruction-badge hidden">
+            <span>✏️ Click on the satellite map to add plot corners. Double-click or click Finish when done.</span>
+          </div>
+
+          <!-- Floating Draw Action Toolbar -->
+          <div id="draw-floating-toolbar" class="draw-floating-toolbar hidden">
+            <button id="draw-btn-finish" class="draw-action-btn btn-finish" disabled>
+              <span>✓ Finish Plot (0 points)</span>
+            </button>
+            <button id="draw-btn-undo" class="draw-action-btn btn-undo" disabled>
+              <span>↶ Undo</span>
+            </button>
+            <button id="draw-btn-cancel" class="draw-action-btn btn-cancel">
+              <span>✕ Cancel</span>
+            </button>
+          </div>
+
+          <!-- Floating Plot Area Badge -->
+          <div id="map-area-badge" class="map-area-badge hidden">
+            <span class="area-icon">📐</span>
+            <span id="map-area-val">0.00 Acres</span>
+          </div>
+        </div>
+
+        <!-- Map Tools & Layer Strip -->
+        <div class="map-tools">
+          <div class="tools-group">
+            <button class="map-tool-btn active" id="tool-cursor" title="Pin / Inspect Mode">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>
+              <span>Pin</span>
+            </button>
+            <button class="map-tool-btn" id="tool-detect-fields" title="Auto-Detect OpenStreetMap Farmland Parcels">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              <span>OSM Fields</span>
+            </button>
+            <button class="map-tool-btn" id="tool-polygon" title="Draw Plot Boundary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+              <span>Draw Plot</span>
+            </button>
+            <button class="map-tool-btn" id="tool-delete" title="Clear Drawn Plot">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+              <span>Clear</span>
+            </button>
+          </div>
+          
+          <div class="tools-group-right">
+            <button class="map-tool-btn btn-expand" id="tool-fullscreen" title="Toggle Fullscreen Map">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+              <span id="fullscreen-label">Expand</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Coordinates -->
+        <div class="coord-strip">
+          <div class="coord-field">
+            <label>Lat</label>
+            <input type="number" id="lat-input" step="0.0001" value="30.55" />
+          </div>
+          <div class="coord-field">
+            <label>Lng</label>
+            <input type="number" id="lng-input" step="0.0001" value="76.45" />
+          </div>
+          <button id="go-to-coords" class="go-btn">Go</button>
+        </div>
+      </aside>
+
+      <!-- Right: Dashboard -->
+      <main class="dashboard-main" id="dashboard-main">
+        <!-- ---- SETUP STATE ---- -->
+        <div id="setup-panel">
+          <!-- Field Info Bar -->
+          <div class="field-info-bar">
+            <div class="field-info-left">
+              <div class="field-icon-wrap">
+                <svg width="28" height="28" viewBox="0 0 56 56" fill="none">
+                  <path d="M28 6 C 12 18, 12 42, 28 52 C 44 42, 44 18, 28 6Z" fill="#1a7a42"/>
+                  <path d="M24 24 L 20 34 L 28 30 L 34 20 L 24 24Z" fill="#fff"/>
+                </svg>
+              </div>
+              <div>
+                <span class="field-name">Field 1 <button class="edit-icon" title="Rename">✏️</button></span>
+                <span class="field-meta">
+                  <span id="field-crop-label">Wheat</span> ·
+                  <span id="field-area-label">—</span> ·
+                  <span id="field-location-label">Select on map</span>
+                </span>
+              </div>
+            </div>
+            <div class="field-info-right">
+              <div class="sowing-info">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a7a42" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <div>
+                  <span class="sowing-label">Sowing Date</span>
+                  <span class="sowing-value" id="sowing-date-display">—</span>
+                </div>
+              </div>
+              <button id="save-field-btn" class="btn-save-field" title="Save this land to your Neon DB account">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                <span>Save Field</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Configuration Cards -->
+          <div class="config-grid">
+            <div class="config-card">
+              <label class="config-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7a42" stroke-width="2"><path d="M12 2v8l4 2"/><circle cx="12" cy="14" r="8"/></svg>
+                Crop Type
+              </label>
+              <select id="crop-select" class="config-select">
+                <option value="rice">🌾 Rice (Paddy)</option>
+                <option value="wheat" selected>🌾 Wheat</option>
+                <option value="maize">🌽 Maize (Corn)</option>
+                <option value="cotton">🏵️ Cotton</option>
+                <option value="sugarcane">🎋 Sugarcane</option>
+                <option value="soybean">🫘 Soybean</option>
+                <option value="groundnut">🥜 Groundnut</option>
+              </select>
+            </div>
+            <div class="config-card">
+              <label class="config-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7a42" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+                Sowing / Planting Date
+              </label>
+              <input type="date" id="planting-date" class="config-input" />
+            </div>
+            <div class="config-card">
+              <label class="config-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7a42" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                Current Growth Stage
+              </label>
+              <div class="stage-badge" id="growth-stage-display">—</div>
+            </div>
+            <div class="config-card">
+              <label class="config-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7a42" stroke-width="2"><path d="M2 22 L 12 2 L 22 22Z"/></svg>
+                Soil Source / Override
+              </label>
+              <select id="soil-select" class="config-select">
+                <option value="auto" selected>🛰️ Live ISRIC SoilGrids (Auto)</option>
+                <option value="sand">Sand</option>
+                <option value="loamy_sand">Loamy Sand</option>
+                <option value="sandy_loam">Sandy Loam</option>
+                <option value="loam">Loam</option>
+                <option value="silt_loam">Silt Loam</option>
+                <option value="clay_loam">Clay Loam</option>
+                <option value="silty_clay">Silty Clay</option>
+                <option value="clay">Clay</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Live Soil Profile Card (ISRIC SoilGrids Data) -->
+          <div class="soil-profile-card" id="soil-profile-card">
+            <div class="soil-card-header">
+              <div class="soil-header-left">
+                <span class="soil-icon">🧪</span>
+                <div>
+                  <h4 class="soil-title">Physical Soil Classification</h4>
+                  <span class="soil-subtitle" id="soil-source-tag">ISRIC SoilGrids v2.0 Global 250m Resolution</span>
+                </div>
+              </div>
+              <span class="soil-type-badge" id="soil-type-badge">Analyzing Soil...</span>
+            </div>
+            
+            <!-- Soil Texture Stack Bar -->
+            <div class="soil-texture-bar-wrap">
+              <div class="soil-texture-bar">
+                <div class="st-segment st-sand" id="st-sand-bar" style="width: 27%;" title="Sand"></div>
+                <div class="st-segment st-silt" id="st-silt-bar" style="width: 38%;" title="Silt"></div>
+                <div class="st-segment st-clay" id="st-clay-bar" style="width: 35%;" title="Clay"></div>
+              </div>
+              <div class="soil-texture-legend">
+                <span class="st-legend-item"><span class="st-dot st-sand-dot"></span> Sand: <strong id="st-sand-val">27%</strong></span>
+                <span class="st-legend-item"><span class="st-dot st-silt-dot"></span> Silt: <strong id="st-silt-val">38%</strong></span>
+                <span class="st-legend-item"><span class="st-dot st-clay-dot"></span> Clay: <strong id="st-clay-val">35%</strong></span>
+                <span class="st-legend-item"><span class="st-dot st-soc-dot"></span> SOC: <strong id="st-soc-val">15.6 g/kg</strong></span>
+              </div>
+            </div>
+
+            <!-- Soil Hydraulic Parameters -->
+            <div class="soil-metrics-mini">
+              <div class="soil-metric-mini">
+                <span class="smm-label">Field Capacity (FC)</span>
+                <span class="smm-val" id="smm-fc">340 mm/m</span>
+              </div>
+              <div class="soil-metric-mini">
+                <span class="smm-label">Wilting Point (PWP)</span>
+                <span class="smm-val" id="smm-pwp">190 mm/m</span>
+              </div>
+              <div class="soil-metric-mini">
+                <span class="smm-label">Root Water Capacity (TAW)</span>
+                <span class="smm-val" id="smm-taw">90 mm</span>
+              </div>
+              <div class="soil-metric-mini">
+                <span class="smm-label">Safe Threshold (RAW)</span>
+                <span class="smm-val" id="smm-raw">45 mm</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Soil Nutrients & Chemical Health Card (ISRIC SoilGrids Data) -->
+          <div class="soil-nutrients-card" id="soil-nutrients-card">
+            <div class="nutrient-card-header">
+              <div class="soil-header-left">
+                <span class="soil-icon">🌱</span>
+                <div>
+                  <h4 class="soil-title">Soil Nutrients & Chemical Fertility</h4>
+                  <span class="soil-subtitle" id="nutrient-source-tag">ISRIC SoilGrids Nitrogen, pH & Cation Exchange</span>
+                </div>
+              </div>
+              <span class="nutrient-overall-pill" id="sn-overall-badge">Optimal Fertility</span>
+            </div>
+
+            <!-- 4-Grid Chemical Metrics -->
+            <div class="nutrient-grid">
+              <!-- Nitrogen (N) -->
+              <div class="nutrient-metric-box">
+                <div class="nmb-header">
+                  <span class="nmb-label">Total Nitrogen (N)</span>
+                  <span class="nmb-badge badge-green" id="sn-n-badge">Optimal</span>
+                </div>
+                <div class="nmb-value-row">
+                  <span class="nmb-val" id="sn-n-val">1.35 g/kg</span>
+                  <span class="nmb-unit">N (tot)</span>
+                </div>
+                <div class="nmb-bar-wrap">
+                  <div class="nmb-bar-fill" id="sn-n-bar" style="width: 65%;"></div>
+                </div>
+              </div>
+
+              <!-- Soil pH -->
+              <div class="nutrient-metric-box">
+                <div class="nmb-header">
+                  <span class="nmb-label">Soil pH (H₂O)</span>
+                  <span class="nmb-badge badge-green" id="sn-ph-badge">Optimal (6.8)</span>
+                </div>
+                <div class="nmb-value-row">
+                  <span class="nmb-val" id="sn-ph-val">6.8 pH</span>
+                  <span class="nmb-unit">Acidity / Base</span>
+                </div>
+                <div class="nmb-bar-wrap">
+                  <div class="nmb-bar-fill ph-bar" id="sn-ph-bar" style="width: 68%;"></div>
+                </div>
+              </div>
+
+              <!-- Cation Exchange Capacity (CEC - K+ Buffer) -->
+              <div class="nutrient-metric-box">
+                <div class="nmb-header">
+                  <span class="nmb-label">Cation Buffer (CEC)</span>
+                  <span class="nmb-badge badge-green" id="sn-cec-badge">Good K+ Buffer</span>
+                </div>
+                <div class="nmb-value-row">
+                  <span class="nmb-val" id="sn-cec-val">18.5 cmol/kg</span>
+                  <span class="nmb-unit">CEC</span>
+                </div>
+                <div class="nmb-bar-wrap">
+                  <div class="nmb-bar-fill cec-bar" id="sn-cec-bar" style="width: 72%;"></div>
+                </div>
+              </div>
+
+              <!-- Carbon-to-Nitrogen (C:N) -->
+              <div class="nutrient-metric-box">
+                <div class="nmb-header">
+                  <span class="nmb-label">C:N Ratio</span>
+                  <span class="nmb-badge badge-green" id="sn-cn-badge">Balanced (11.8)</span>
+                </div>
+                <div class="nmb-value-row">
+                  <span class="nmb-val" id="sn-cn-val">11.8</span>
+                  <span class="nmb-unit">SOC / N</span>
+                </div>
+                <div class="nmb-bar-wrap">
+                  <div class="nmb-bar-fill cn-bar" id="sn-cn-bar" style="width: 60%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Agronomic Nutrient & Fertilizer Guidance -->
+            <div class="nutrient-advice-box" id="nutrient-advice-box">
+              <div class="nab-item">
+                <span class="nab-icon">🧪</span>
+                <span class="nab-text"><strong>Phosphorus (P) Status:</strong> <span id="sn-p-text">Peak Soluble Orthophosphate (optimal pH availability).</span></span>
+              </div>
+              <div class="nab-item">
+                <span class="nab-icon">🌾</span>
+                <span class="nab-text"><strong>Potassium (K) & Base Buffer:</strong> <span id="sn-k-text">Strong cation exchange capacity prevents rapid leaching during irrigation.</span></span>
+              </div>
+              <div class="nab-item" id="sn-custom-advice-row">
+                <span class="nab-icon">💡</span>
+                <span class="nab-text" id="sn-custom-advice">Balanced fertility profile: Soil exhibits optimal pH and robust cation holding capacity for standard crop feeding.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Irrigation Records -->
+          <div class="irr-section">
+            <div class="irr-header">
+              <span class="irr-title">💧 Recent Irrigation Events</span>
+              <button id="add-irrigation" class="btn-outline-sm">+ Add Record</button>
+            </div>
+            <div id="irrigation-list" class="irr-list">
+              <span class="irr-empty">No irrigation records added yet</span>
+            </div>
+          </div>
+
+          <!-- Analyze Button -->
+          <button id="analyze-btn" class="btn-analyze">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            Analyze Water Stress
+          </button>
+        </div>
+
+        <!-- ---- LOADING STATE ---- -->
+        <div id="loading-panel" style="display:none;">
+          <div class="analysis-loader">
+            <div class="loader-steps">
+              <div class="loader-step active" id="step-weather">
+                <div class="step-dot"></div>
+                <span>🌧 Fetching weather data...</span>
+              </div>
+              <div class="loader-step" id="step-soil">
+                <div class="step-dot"></div>
+                <span>🪨 Analyzing soil properties...</span>
+              </div>
+              <div class="loader-step" id="step-satellite">
+                <div class="step-dot"></div>
+                <span>🛰 Downloading satellite data...</span>
+              </div>
+              <div class="loader-step" id="step-model">
+                <div class="step-dot"></div>
+                <span>⚙️ Running water balance model...</span>
+              </div>
+              <div class="loader-step" id="step-crossval">
+                <div class="step-dot"></div>
+                <span>🔀 Cross-validating sources...</span>
+              </div>
+              <div class="loader-step" id="step-advisory">
+                <div class="step-dot"></div>
+                <span>💧 Generating advisory...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- RESULTS STATE ---- -->
+        <div id="results-panel" style="display:none;">
+          <!-- Field Info Bar (duplicated for results view) -->
+          <div class="field-info-bar" id="results-field-bar">
+            <div class="field-info-left">
+              <div class="field-icon-wrap">
+                <svg width="28" height="28" viewBox="0 0 56 56" fill="none">
+                  <path d="M28 6 C 12 18, 12 42, 28 52 C 44 42, 44 18, 28 6Z" fill="#1a7a42"/>
+                  <path d="M24 24 L 20 34 L 28 30 L 34 20 L 24 24Z" fill="#fff"/>
+                </svg>
+              </div>
+              <div>
+                <span class="field-name">Field 1</span>
+                <span class="field-meta" id="results-field-meta">—</span>
+              </div>
+            </div>
+            <div class="field-info-right">
+              <div class="sowing-info">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a7a42" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <div>
+                  <span class="sowing-label">Sowing Date</span>
+                  <span class="sowing-value" id="results-sowing-date">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ★ Main Advisory Banner -->
+          <div class="advisory-banner" id="advisory-banner">
+            <div class="advisory-left">
+              <div class="advisory-icon" id="advisory-icon">
+                <svg width="48" height="48" viewBox="0 0 56 56" fill="none">
+                  <circle cx="28" cy="28" r="24" fill="#e8f5e9"/>
+                  <path d="M28 12 C 18 20, 18 38, 28 46 C 38 38, 38 20, 28 12Z" fill="#1a7a42"/>
+                  <path d="M24 26 L 28 34 L 34 22" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+              </div>
+              <div class="advisory-text">
+                <h2 id="advisory-headline">Analyzing...</h2>
+                <p id="advisory-subtext">Processing your field data.</p>
+              </div>
+            </div>
+            <div class="advisory-right">
+              <div class="advisory-stat">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a7a42" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <div>
+                  <span class="stat-label">Water may be needed in</span>
+                  <span class="stat-value" id="days-to-stress-val">—</span>
+                </div>
+              </div>
+              <div class="advisory-stat">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e67e22" stroke-width="2"><path d="M12 2v6l4 2"/><circle cx="12" cy="14" r="8"/></svg>
+                <div>
+                  <span class="stat-label">If no rain, estimated yield loss</span>
+                  <span class="stat-value" id="yield-loss-val">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ★ Metrics Cards Row -->
+          <div class="metrics-row">
+            <div class="metric-card">
+              <div class="mc-icon mc-icon-blue">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 5 10 5 15a7 7 0 0014 0c0-5-7-13-7-13z" fill="#3498db"/></svg>
+              </div>
+              <div class="mc-body">
+                <span class="mc-label">Soil water now</span>
+                <span class="mc-value" id="mc-soil-water">—</span>
+                <div class="mc-bar"><div class="mc-bar-fill mc-bar-green" id="mc-soil-bar" style="width:0%"></div></div>
+                <span class="mc-hint" id="mc-soil-hint">—</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-icon mc-icon-yellow">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 5 10 5 15a7 7 0 0014 0c0-5-7-13-7-13z" fill="#e67e22" opacity="0.8"/><line x1="8" y1="16" x2="16" y2="16" stroke="#fff" stroke-width="2"/></svg>
+              </div>
+              <div class="mc-body">
+                <span class="mc-label">Safe level</span>
+                <span class="mc-value" id="mc-safe-level">—</span>
+                <div class="mc-bar"><div class="mc-bar-fill mc-bar-yellow" id="mc-safe-bar" style="width:0%"></div></div>
+                <span class="mc-hint" id="mc-safe-hint">—</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-icon mc-icon-gray">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2"><path d="M16 13v-2a4 4 0 00-8 0v2"/><path d="M4 18a8 8 0 0116 0"/><line x1="12" y1="13" x2="12" y2="18"/></svg>
+              </div>
+              <div class="mc-body">
+                <span class="mc-label">Rain expected (next 7 days)</span>
+                <span class="mc-value" id="mc-rain-expected">—</span>
+                <span class="mc-hint" id="mc-rain-hint">—</span>
+              </div>
+            </div>
+            <div class="metric-card">
+              <div class="mc-icon mc-icon-orange">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" fill="#f39c12"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="#f39c12" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <div class="mc-body">
+                <span class="mc-label">Crop water use (next 7 days)</span>
+                <span class="mc-value" id="mc-crop-et">—</span>
+                <span class="mc-hint" id="mc-et-hint">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ★ Charts Grid Row 1: Water Balance & Inflows/Outflows -->
+          <div class="charts-row">
+            <div class="chart-panel">
+              <div class="panel-header-flex">
+                <div>
+                  <h3 class="panel-title">💧 Root-Zone Soil Water Dynamics</h3>
+                  <span class="panel-subtitle">Daily root-zone moisture vs RAW threshold & Field Capacity (TAW)</span>
+                </div>
+                <span class="chart-tag-pill">FAO-56 Dual Kc</span>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="moisture-chart"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-panel">
+              <div class="panel-header-flex">
+                <div>
+                  <h3 class="panel-title">📊 Water Inflows vs Outflows</h3>
+                  <span class="panel-subtitle">Rainfall & Irrigation vs Crop Transpiration (ETc) & Deep Drainage</span>
+                </div>
+                <span class="chart-tag-pill">Water Budget</span>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="inflow-outflow-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- ★ Charts Grid Row 2: Crop Demand & Satellite Health -->
+          <div class="charts-row">
+            <div class="chart-panel">
+              <div class="panel-header-flex">
+                <div>
+                  <h3 class="panel-title">🌾 Crop Water Demand (ETc) & Kc Progression</h3>
+                  <span class="panel-subtitle">Actual Crop ET (ETc) vs Reference ET (ET₀) across growth stages</span>
+                </div>
+                <span class="chart-tag-pill">Crop Evapotranspiration</span>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="etc-demand-chart"></canvas>
+              </div>
+            </div>
+
+            <div class="satellite-panel">
+              <div class="panel-header-flex">
+                <div>
+                  <h3 class="panel-title">🛰️ Satellite Vegetation Signal (MODIS NDVI)</h3>
+                  <span class="panel-subtitle">Canopy greenness & biomass trend cross-validated against model</span>
+                </div>
+                <span class="chart-tag-pill" id="sat-status-pill">Satellite Validated</span>
+              </div>
+              <div class="sat-content" id="sat-content">
+                <div class="sat-info">
+                  <div class="sat-icon-wrap" id="sat-icon-wrap">
+                    <svg width="32" height="32" viewBox="0 0 56 56" fill="none">
+                      <path d="M28 6 C 12 18, 12 42, 28 52 C 44 42, 44 18, 28 6Z" fill="#1a7a42"/>
+                      <path d="M22 30 L 26 36 L 36 22" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 id="sat-headline">Analyzing satellite data...</h4>
+                    <p id="sat-description">—</p>
+                  </div>
+                </div>
+                <div class="chart-wrap chart-wrap-sm">
+                  <canvas id="ndvi-chart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ★ Charts Grid Row 3: Soil Nutrients Radar & Thermal Microclimate -->
+          <div class="charts-row">
+            <div class="chart-panel">
+              <div class="panel-header-flex">
+                <div>
+                  <h3 class="panel-title">🧪 Soil Fertility & Chemical Balance Radar</h3>
+                  <span class="panel-subtitle">ISRIC SoilGrids N, P, K Buffer, pH, SOC & C:N balance web</span>
+                </div>
+                <span class="chart-tag-pill">Nutrient Web</span>
+              </div>
+              <div class="chart-wrap chart-wrap-sm">
+                <canvas id="nutrient-radar-chart"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-panel">
+              <div class="panel-header-flex">
+                <div>
+                  <h3 class="panel-title">🌡️ Thermal Microclimate & Heat-Stress Curve</h3>
+                  <span class="panel-subtitle">Daily Max/Min Temperatures & Vapor Pressure Deficit (VPD)</span>
+                </div>
+                <span class="chart-tag-pill">Agro-Meteorology</span>
+              </div>
+              <div class="chart-wrap chart-wrap-sm">
+                <canvas id="climate-temp-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- ★ Cross-Validation & Yield Stage -->
+          <div class="charts-row">
+            <div class="chart-panel cv-panel-card">
+              <div class="panel-header-flex">
+                <div>
+                  <h3 class="panel-title">🔀 Multi-Source Cross-Validation Matrix</h3>
+                  <span class="panel-subtitle">Physics model vs Satellite NDVI sensor anomaly agreement</span>
+                </div>
+                <span class="chart-tag-pill" id="cv-badge-tag">Confidence: 92%</span>
+              </div>
+              <div id="cv-matrix" class="cv-matrix-wrap"></div>
+              <div id="cv-details" class="cv-details-text"></div>
+            </div>
+
+            <div class="chart-panel">
+              <div class="panel-header-flex">
+                <div>
+                  <h3 class="panel-title">⚠️ Yield-Loss Sensitivity by Growth Stage</h3>
+                  <span class="panel-subtitle">FAO-33 yield reduction risk based on stage-specific Ky factors</span>
+                </div>
+                <span class="chart-tag-pill">FAO-33 Ky</span>
+              </div>
+              <div class="chart-wrap chart-wrap-sm">
+                <canvas id="yield-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- ★ Verbose Section: Phenological Timeline & Detailed Soil Diagnostics -->
+          <div class="verbose-analytics-section">
+            <!-- Crop Phenology Timeline -->
+            <div class="verbose-card">
+              <div class="verbose-card-header">
+                <div class="vch-left">
+                  <span class="vch-icon">🌱</span>
+                  <div>
+                    <h4 class="vch-title">Phenological Crop Growth Stage Timeline</h4>
+                    <span class="vch-sub">Stage durations, rooting progression (Zr), and water stress sensitivity</span>
+                  </div>
+                </div>
+                <span class="vch-badge" id="pheno-current-stage">Day 90 / 120</span>
+              </div>
+              <div class="pheno-timeline-wrap" id="pheno-timeline-container">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Deep Soil Physical & Chemical Diagnostic Specification -->
+            <div class="verbose-card">
+              <div class="verbose-card-header">
+                <div class="vch-left">
+                  <span class="vch-icon">🔬</span>
+                  <div>
+                    <h4 class="vch-title">Comprehensive Soil Physical & Chemical Diagnostic</h4>
+                    <span class="vch-sub">ISRIC SoilGrids 250m global root-zone pedotransfer calculations</span>
+                  </div>
+                </div>
+                <span class="vch-badge">ISRIC v2.0 Global</span>
+              </div>
+              <div class="verbose-soil-grid" id="verbose-soil-grid">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Daily Water Balance Ledger (Interactive Table) -->
+            <div class="verbose-card">
+              <div class="verbose-card-header">
+                <div class="vch-left">
+                  <span class="vch-icon">📋</span>
+                  <div>
+                    <h4 class="vch-title">Daily Water Balance Audit Ledger</h4>
+                    <span class="vch-sub">Complete historical and 7-day forecast daily model calculations</span>
+                  </div>
+                </div>
+                <div class="vch-actions">
+                  <span id="ledger-rows-count" class="ledger-count">97 days logged</span>
+                </div>
+              </div>
+              <div class="ledger-table-wrap">
+                <table class="ledger-table" id="daily-ledger-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Stage</th>
+                      <th>ET₀ (mm)</th>
+                      <th>Kc</th>
+                      <th>ETc (mm)</th>
+                      <th>Rain (mm)</th>
+                      <th>Irrig (mm)</th>
+                      <th>Moisture (mm)</th>
+                      <th>RAW Limit</th>
+                      <th>Ks Coeff</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="daily-ledger-body">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ★ Action Cards -->
+          <div class="action-cards">
+            <div class="action-card" id="action-forecast">
+              <div class="ac-icon" style="background:#fff3e0;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M16 13v-2a4 4 0 00-8 0v2"/><path d="M4 18a8 8 0 0116 0"/><path d="M12 13v5" stroke="#e67e22" stroke-width="2"/></svg>
+              </div>
+              <div class="ac-text">
+                <strong>7-Day Forecast</strong>
+                <span>See rainfall & stress projection</span>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+            <div class="action-card" id="action-irrigation">
+              <div class="ac-icon" style="background:#e3f2fd;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2C12 2 5 10 5 15a7 7 0 0014 0c0-5-7-13-7-13z" fill="#3498db"/></svg>
+              </div>
+              <div class="ac-text">
+                <strong>Add irrigation plan</strong>
+                <span>See new estimate</span>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+            <div class="action-card" id="action-data">
+              <div class="ac-icon" style="background:#fce4ec;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+              </div>
+              <div class="ac-text">
+                <strong>Data sources & quality</strong>
+                <span>See how your data checks out</span>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+          </div>
+
+          <!-- 7-day forecast (expandable) -->
+          <div id="forecast-section" class="forecast-section" style="display:none;">
+            <div class="chart-panel">
+              <h3 class="panel-title">7-Day Weather & Stress Projection</h3>
+              <div class="chart-wrap">
+                <canvas id="forecast-chart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Data Quality (expandable) -->
+          <div id="dq-section" class="dq-section" style="display:none;">
+            <div class="chart-panel">
+              <h3 class="panel-title">Data Sources & Quality</h3>
+              <div id="data-quality-grid" class="dq-grid"></div>
+            </div>
+          </div>
+
+          <!-- Warnings -->
+          <div id="warnings-section" style="display:none;">
+            <ul id="warnings-list" class="warnings-list"></ul>
+          </div>
+
+          <!-- ★ Footer Disclaimer -->
+          <div class="footer-disclaimer">
+            <span class="fd-icon">ℹ️</span>
+            <p>COGNITIA gives helpful advice based on weather, soil and satellite data. It is not a substitute for your own experience or expert advice.</p>
+            <p class="fd-tagline">🌱 Better Information. Healthier Crops. Brighter Tomorrows.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Bottom Nav (mobile-style) -->
+    <nav class="bottom-nav">
+      <a href="#" class="bnav-item active">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#1a7a42" stroke="#1a7a42" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        <span>Home</span>
+      </a>
+      <a href="#" class="bnav-item" id="bnav-my-fields">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><path d="M12 2v8l4 2"/><circle cx="12" cy="14" r="8"/></svg>
+        <span>My Fields</span>
+      </a>
+      <a href="#" class="bnav-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        <span>Advice</span>
+      </a>
+      <a href="#" class="bnav-item">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        <span>Learn</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- ===== MODAL: SAVE FIELD TO NEON DB ===== -->
+  <div id="save-field-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="modal-header-icon">💾</span>
+          <div>
+            <h3 class="modal-title">Save Field to Account</h3>
+            <span class="modal-subtitle">Persist your land parcel to Neon PostgreSQL ⚡</span>
+          </div>
+        </div>
+        <button id="close-save-modal" class="modal-close-btn">✕</button>
+      </div>
+      
+      <div class="modal-body-form">
+        <div class="form-group">
+          <label class="form-label">Field / Plot Name</label>
+          <input type="text" id="save-field-name" class="form-input" placeholder="e.g. North Canal Farm (Plot #1)" value="My Agricultural Plot" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Crop Type</label>
+            <select id="save-crop-select" class="form-select">
+              <option value="wheat">🌾 Wheat</option>
+              <option value="rice">🌾 Rice (Paddy)</option>
+              <option value="maize">🌽 Maize (Corn)</option>
+              <option value="cotton">🏵️ Cotton</option>
+              <option value="sugarcane">🎋 Sugarcane</option>
+              <option value="soybean">🫘 Soybean</option>
+              <option value="groundnut">🥜 Groundnut</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sowing Date</label>
+            <input type="date" id="save-planting-date" class="form-input" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Calculated Area (Acres)</label>
+            <input type="number" step="0.01" id="save-area-acres" class="form-input" placeholder="e.g. 3.5" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Soil Type (SoilGrids)</label>
+            <input type="text" id="save-soil-type" class="form-input" readonly />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Location Coordinates</label>
+          <input type="text" id="save-coords-display" class="form-input" readonly />
+        </div>
+
+        <div class="save-neon-notice">
+          <span class="notice-icon">⚡</span>
+          <span class="notice-text">Stored securely in your <strong>Neon Serverless PostgreSQL</strong> account. Accessible across any device.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="cancel-save-field" class="btn-secondary">Cancel</button>
+        <button id="confirm-save-field" class="btn-primary-action">
+          <span>⚡ Save to Neon Database</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: MY SAVED FIELDS DRAWER ===== -->
+  <div id="my-fields-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <span class="modal-header-icon">🌾</span>
+          <div>
+            <h3 class="modal-title">My Farm Parcels</h3>
+            <span class="modal-subtitle">Neon Serverless PostgreSQL Database</span>
+          </div>
+        </div>
+        <div class="modal-header-right">
+          <span class="neon-live-pill">⚡ Neon DB Live</span>
+          <button id="close-my-fields-modal" class="modal-close-btn">✕</button>
+        </div>
+      </div>
+
+      <div class="my-fields-content">
+        <div class="saved-fields-toolbar">
+          <span id="saved-fields-count" class="fields-count-badge">2 saved fields</span>
+          <button id="btn-draw-new-plot" class="btn-add-plot">+ Draw New Plot</button>
+        </div>
+
+        <div id="saved-fields-list" class="saved-fields-grid">
+          <!-- Populated dynamically via Neon DB -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
