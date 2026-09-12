@@ -65,6 +65,11 @@ export function renderDashboard(advisory, wbResult, ndviData, crossVal, yieldLos
   renderDataQuality(advisory.dataQuality);
   renderWarnings(advisory.warnings);
   setupActionCards(wbResult);
+
+  // Smooth scroll to results panel in Neo-Brutalist view
+  setTimeout(() => {
+    document.getElementById('results-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
 }
 
 function renderFieldBar(advisory) {
@@ -1185,11 +1190,11 @@ function chartOptions(yTitle, forecastStartIdx) {
     plugins: {
       legend: {
         labels: {
-          color: '#475569',
-          font: { family: 'Plus Jakarta Sans', size: 11, weight: '700' },
+          color: '#111827',
+          font: { family: 'Space Grotesk', size: 11, weight: '700' },
           usePointStyle: true,
-          pointStyleWidth: 8,
-          boxHeight: 6,
+          pointStyleWidth: 9,
+          boxHeight: 7,
         }
       },
       tooltip: tooltipConfig(),
@@ -1197,12 +1202,12 @@ function chartOptions(yTitle, forecastStartIdx) {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: '#64748b', font: { family: 'Inter', size: 10, weight: '500' }, maxTicksLimit: 10, maxRotation: 45 }
+        ticks: { color: '#4b5563', font: { family: 'Space Grotesk', size: 10, weight: '700' }, maxTicksLimit: 10, maxRotation: 45 }
       },
       y: {
-        grid: { color: '#f1f5f9' },
-        ticks: { color: '#64748b', font: { family: 'Inter', size: 10, weight: '500' } },
-        title: { display: true, text: yTitle, color: '#475569', font: { family: 'Plus Jakarta Sans', size: 11, weight: '700' } }
+        grid: { color: '#e5e7eb', lineWidth: 1.5 },
+        ticks: { color: '#4b5563', font: { family: 'Space Grotesk', size: 10, weight: '700' } },
+        title: { display: true, text: yTitle, color: '#111827', font: { family: 'Syne', size: 11, weight: '800' } }
       },
     },
   };
@@ -1211,19 +1216,19 @@ function chartOptions(yTitle, forecastStartIdx) {
 function tooltipConfig() {
   return {
     backgroundColor: '#ffffff',
-    titleColor: '#0f172a',
-    bodyColor: '#334155',
-    borderColor: '#cbd5e1',
-    borderWidth: 1.5,
-    cornerRadius: 10,
+    titleColor: '#111827',
+    bodyColor: '#111827',
+    borderColor: '#111827',
+    borderWidth: 2.5,
+    cornerRadius: 8,
     padding: 12,
     boxPadding: 4,
-    titleFont: { family: 'Plus Jakarta Sans', weight: '800', size: 12 },
-    bodyFont: { family: 'Inter', weight: '500', size: 11 },
-    shadowOffsetX: 0,
-    shadowOffsetY: 8,
-    shadowBlur: 16,
-    shadowColor: 'rgba(0,0,0,0.1)',
+    titleFont: { family: 'Syne', weight: '900', size: 13 },
+    bodyFont: { family: 'Space Grotesk', weight: '700', size: 12 },
+    shadowOffsetX: 4,
+    shadowOffsetY: 4,
+    shadowBlur: 0,
+    shadowColor: '#111827',
   };
 }
 
