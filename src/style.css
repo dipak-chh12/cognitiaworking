@@ -84,6 +84,8 @@
   /* Transitions */
   --trans-fast: 0.15s ease;
   --trans-normal: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  --trans-spring: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --trans-smooth: 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* === RESET & BASE STYLES === */
@@ -668,11 +670,12 @@ button, input, select, textarea {
 }
 
 .section-serif-title {
-  font-family: var(--font-heading);
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
   color: var(--ink-primary);
+  font-style: normal;
   margin-bottom: 8px;
 }
 
@@ -696,12 +699,22 @@ button, input, select, textarea {
   flex-direction: column;
   position: relative;
   transition: all var(--trans-normal);
+  will-change: transform, box-shadow;
 }
 
 .method-card:hover {
   background: var(--bg-surface);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hover);
+}
+
+.method-card:hover .method-num {
+  color: var(--ink-primary);
+  transform: scale(1.1);
+}
+
+.method-card:hover .method-icon-wrap {
+  transform: scale(1.15) translateY(-2px);
 }
 
 .method-num {
@@ -710,11 +723,13 @@ button, input, select, textarea {
   font-weight: 600;
   color: var(--ink-faint);
   margin-bottom: 12px;
+  transition: all var(--trans-fast);
 }
 
 .method-icon-wrap {
   font-size: 1.6rem;
   margin-bottom: 12px;
+  transition: transform var(--trans-spring);
 }
 
 .method-title {
@@ -2379,5 +2394,334 @@ button, input, select, textarea {
   }
   .pheno-steps-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================
+   ANIMATION & SCROLL REVEAL SYSTEM
+   ========================================== */
+
+/* === Reveal Base State (before IntersectionObserver triggers) === */
+.reveal {
+  opacity: 0;
+  will-change: opacity, transform;
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.reveal-up {
+  transform: translateY(32px);
+}
+
+.reveal.reveal-left {
+  transform: translateX(-32px);
+}
+
+.reveal.reveal-right {
+  transform: translateX(32px);
+}
+
+.reveal.reveal-scale {
+  transform: scale(0.92);
+}
+
+/* === Revealed State (applied by IntersectionObserver) === */
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0) translateX(0) scale(1);
+}
+
+/* === Stagger Support (children animation delays) === */
+.stagger-children > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stagger-children.revealed > *:nth-child(1) { transition-delay: 0ms; opacity: 1; transform: none; }
+.stagger-children.revealed > *:nth-child(2) { transition-delay: 60ms; opacity: 1; transform: none; }
+.stagger-children.revealed > *:nth-child(3) { transition-delay: 120ms; opacity: 1; transform: none; }
+.stagger-children.revealed > *:nth-child(4) { transition-delay: 180ms; opacity: 1; transform: none; }
+.stagger-children.revealed > *:nth-child(5) { transition-delay: 240ms; opacity: 1; transform: none; }
+.stagger-children.revealed > *:nth-child(6) { transition-delay: 300ms; opacity: 1; transform: none; }
+
+/* === Keyframe Animations === */
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes breathe-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.15); }
+  50% { box-shadow: 0 0 0 8px rgba(5, 150, 105, 0); }
+}
+
+@keyframes counter-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes slide-in-bottom {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* === Premium Micro-Interactions === */
+
+/* Card lift on hover */
+.chart-panel-minimal {
+  transition: transform var(--trans-normal), box-shadow var(--trans-normal);
+  will-change: transform;
+}
+
+.chart-panel-minimal:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Metric box breathe */
+.metric-box-minimal {
+  transition: transform var(--trans-normal), box-shadow var(--trans-normal);
+}
+
+.metric-box-minimal:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Button press effect */
+.btn-minimal:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Stepper step animation */
+.stepper-step.active .step-badge-num {
+  animation: breathe-glow 2s ease-in-out infinite;
+}
+
+/* Soil texture bar segments animate on load */
+.texture-bar-minimal .tb-seg {
+  animation: slide-in-bottom 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.texture-bar-minimal .tb-seg:nth-child(1) { animation-delay: 0.1s; }
+.texture-bar-minimal .tb-seg:nth-child(2) { animation-delay: 0.2s; }
+.texture-bar-minimal .tb-seg:nth-child(3) { animation-delay: 0.3s; }
+
+/* Chemical progress bar fill animation */
+.chem-bar-fill {
+  animation: bar-fill-grow 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: 0.3s;
+}
+
+@keyframes bar-fill-grow {
+  from { width: 0 !important; }
+}
+
+/* MBM progress bar animation */
+.mbm-bar {
+  animation: bar-fill-grow 1s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: 0.5s;
+}
+
+/* Verbose card hover */
+.verbose-card-minimal {
+  transition: transform var(--trans-normal), box-shadow var(--trans-normal);
+}
+
+.verbose-card-minimal:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Phenology step card pulse on hover */
+.pheno-step-card {
+  transition: all var(--trans-normal);
+}
+
+.pheno-step-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card);
+}
+
+/* Action card arrow shift on hover */
+.action-card-minimal .acm-arrow {
+  transition: transform var(--trans-fast);
+}
+
+.action-card-minimal:hover .acm-arrow {
+  transform: translateX(4px);
+}
+
+/* V-diag card hover */
+.v-diag-card {
+  transition: transform var(--trans-normal), box-shadow var(--trans-normal);
+}
+
+.v-diag-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+/* Auth pill hover */
+.auth-pill {
+  transition: all var(--trans-fast);
+}
+
+.auth-pill:hover {
+  border-color: var(--ink-primary);
+  background: var(--bg-subtle);
+  transform: translateY(-1px);
+}
+
+/* Preset chip scale */
+.preset-chip {
+  transition: all var(--trans-fast);
+}
+
+.preset-chip:hover {
+  transform: scale(1.03);
+}
+
+/* Toast entrance */
+.toast-minimal {
+  animation: slide-in-bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Loading screen fade-out */
+.loading-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+/* === Premium Dashboard Typography Mixins === */
+
+/* Large serif display numbers (advisory headline, stat numbers) */
+#advisory-headline {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.03em;
+}
+
+/* Metric numbers use serif for editorial feel */
+.mbm-num {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-style: normal;
+  letter-spacing: -0.02em;
+}
+
+/* Stat numbers in advisory banner */
+.stat-number {
+  font-family: var(--font-serif);
+  letter-spacing: -0.03em;
+}
+
+/* Chart panel titles — editorial serif */
+.cpm-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: -0.01em;
+}
+
+/* Verbose card titles — serif emphasis */
+.vcm-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Table headers — tight mono labels */
+.ledger-table-minimal th {
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Method card title — clean bold sans */
+.method-title {
+  font-family: var(--font-heading);
+}
+
+/* Showcase main title — big editorial serif */
+.showcase-main-title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
+
+/* Card title in showcase — heading sans for contrast */
+.card-title {
+  font-family: var(--font-heading);
+}
+
+/* Hydraulic value monospace emphasis */
+.hg-val {
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
+}
+
+/* Chemical card number serif */
+.chem-num {
+  font-family: var(--font-serif);
+  letter-spacing: -0.02em;
+}
+
+/* Modal title serif */
+.modal-title-serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+
+/* Stepper title serif */
+.stepper-title-serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Phenology step title — use heading */
+.psc-title {
+  font-family: var(--font-heading);
+}
+
+/* Footer brand serif */
+.minimal-footer .brand-name-serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .stagger-children > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

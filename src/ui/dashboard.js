@@ -66,7 +66,12 @@ export function renderDashboard(advisory, wbResult, ndviData, crossVal, yieldLos
   renderWarnings(advisory.warnings);
   setupActionCards(wbResult);
 
-  // Smooth scroll to results panel in Neo-Brutalist view
+  // Add scroll-reveal animations to dashboard elements
+  requestAnimationFrame(() => {
+    addDashboardRevealAnimations();
+  });
+
+  // Smooth scroll to results panel
   setTimeout(() => {
     document.getElementById('results-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 100);
@@ -133,6 +138,34 @@ function renderAdvisoryBanner(advisory) {
   const yl = advisory.yieldLossPercent;
   const ylEl = document.getElementById('yield-loss-val');
   if (ylEl) ylEl.textContent = `~ ${yl}%`;
+}
+
+// === Add Reveal Animations to Dashboard Elements ===
+function addDashboardRevealAnimations() {
+  const selectors = [
+    '.results-meta-header',
+    '.advisory-banner-minimal',
+    '.metrics-grid-minimal',
+    '.charts-row-minimal',
+    '.verbose-card-minimal',
+    '.action-cards-row-minimal',
+  ];
+
+  selectors.forEach((sel, sectionIdx) => {
+    const elements = document.querySelectorAll(`#results-panel ${sel}`);
+    elements.forEach((el, i) => {
+      if (!el.classList.contains('reveal')) {
+        el.classList.add('reveal', 'reveal-up');
+        el.setAttribute('data-delay', String((sectionIdx * 60) + (i * 40)));
+      }
+    });
+  });
+
+  // Metric boxes get stagger
+  const metricsGrid = document.querySelector('#results-panel .metrics-grid-minimal');
+  if (metricsGrid) {
+    metricsGrid.classList.add('stagger-children');
+  }
 }
 
 function renderMetricsRow(advisory, wbResult) {

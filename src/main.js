@@ -65,6 +65,7 @@ let currentSoilData = null;
 
 // === Initialize ===
 function init() {
+  initScrollReveal();
   initShowcaseSlider();
   initMap();
   initMapTools();
@@ -96,6 +97,46 @@ function init() {
   setTimeout(() => {
     document.getElementById('loading-screen')?.classList.add('hidden');
   }, 600);
+}
+
+// === Scroll Reveal Animation System (IntersectionObserver) ===
+function initScrollReveal() {
+  const revealElements = document.querySelectorAll('.reveal');
+  if (!revealElements.length) return;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const delay = parseInt(el.getAttribute('data-delay') || '0', 10);
+        setTimeout(() => {
+          el.classList.add('revealed');
+        }, delay);
+        observer.unobserve(el);
+      }
+    });
+  }, {
+    threshold: 0.12,
+    rootMargin: '0px 0px -40px 0px',
+  });
+
+  revealElements.forEach(el => observer.observe(el));
+
+  // Also observe dynamically injected dashboard elements
+  const mutationObserver = new MutationObserver((mutations) => {
+    mutations.forEach(mutation => {
+      mutation.addedNodes.forEach(node => {
+        if (node.nodeType !== 1) return;
+        const reveals = node.querySelectorAll ? node.querySelectorAll('.reveal:not(.revealed)') : [];
+        reveals.forEach(el => observer.observe(el));
+        if (node.classList && node.classList.contains('reveal') && !node.classList.contains('revealed')) {
+          observer.observe(node);
+        }
+      });
+    });
+  });
+
+  mutationObserver.observe(document.body, { childList: true, subtree: true });
 }
 
 // === Showcase Slider Controller ===
