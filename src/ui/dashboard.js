@@ -1190,11 +1190,11 @@ function chartOptions(yTitle, forecastStartIdx) {
     plugins: {
       legend: {
         labels: {
-          color: '#111827',
-          font: { family: 'Space Grotesk', size: 11, weight: '700' },
+          color: '#374151',
+          font: { family: 'Inter', size: 11, weight: '500' },
           usePointStyle: true,
-          pointStyleWidth: 9,
-          boxHeight: 7,
+          pointStyleWidth: 8,
+          boxHeight: 6,
         }
       },
       tooltip: tooltipConfig(),
@@ -1202,12 +1202,12 @@ function chartOptions(yTitle, forecastStartIdx) {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: '#4b5563', font: { family: 'Space Grotesk', size: 10, weight: '700' }, maxTicksLimit: 10, maxRotation: 45 }
+        ticks: { color: '#6b7280', font: { family: 'Inter', size: 10, weight: '500' }, maxTicksLimit: 10, maxRotation: 45 }
       },
       y: {
-        grid: { color: '#e5e7eb', lineWidth: 1.5 },
-        ticks: { color: '#4b5563', font: { family: 'Space Grotesk', size: 10, weight: '700' } },
-        title: { display: true, text: yTitle, color: '#111827', font: { family: 'Syne', size: 11, weight: '800' } }
+        grid: { color: '#f3f4f6', lineWidth: 1 },
+        ticks: { color: '#6b7280', font: { family: 'Inter', size: 10, weight: '500' } },
+        title: { display: true, text: yTitle, color: '#111827', font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' } }
       },
     },
   };
@@ -1215,20 +1215,16 @@ function chartOptions(yTitle, forecastStartIdx) {
 
 function tooltipConfig() {
   return {
-    backgroundColor: '#ffffff',
-    titleColor: '#111827',
-    bodyColor: '#111827',
-    borderColor: '#111827',
-    borderWidth: 2.5,
+    backgroundColor: '#18181b',
+    titleColor: '#ffffff',
+    bodyColor: '#e4e4e7',
+    borderColor: '#27272a',
+    borderWidth: 1,
     cornerRadius: 8,
-    padding: 12,
+    padding: 10,
     boxPadding: 4,
-    titleFont: { family: 'Syne', weight: '900', size: 13 },
-    bodyFont: { family: 'Space Grotesk', weight: '700', size: 12 },
-    shadowOffsetX: 4,
-    shadowOffsetY: 4,
-    shadowBlur: 0,
-    shadowColor: '#111827',
+    titleFont: { family: 'Plus Jakarta Sans', weight: '600', size: 12 },
+    bodyFont: { family: 'Inter', weight: '400', size: 11 },
   };
 }
 

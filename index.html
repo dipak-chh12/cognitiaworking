@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="COGNITIA — Neo-Brutalist Precision Agro-Intelligence Platform. Physics-based root-zone soil water balance, ISRIC SoilGrids, and satellite cross-validation." />
-  <title>COGNITIA — Bold Precision Agriculture</title>
+  <meta name="description" content="COGNITIA — Physics-based root-zone crop water stress intelligence platform with ISRIC SoilGrids pedotransfer and satellite cross-validation." />
+  <title>COGNITIA — Precision Agro-Hydrology Platform</title>
 
-  <!-- Google Fonts: Syne, Plus Jakarta Sans, Space Grotesk, Space Mono -->
+  <!-- Google Fonts: Newsreader (Editorial Serif) + Inter / Plus Jakarta Sans (Minimal Sans) + JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&family=Syne:wght@700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -20,951 +20,908 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
   <link rel="stylesheet" href="./src/style.css" />
 </head>
-<body class="neo-body">
-
-  <!-- Continuous Neo-Brutalist Marquee Ticker -->
-  <div class="neo-marquee-wrap">
-    <div class="neo-marquee-track">
-      <span>🌾 <strong>COGNITIA AGRO-INTELLIGENCE</strong> · ZERO HARDWARE PROBES NEEDED</span>
-      <span>⚡ <strong>FAO-56 THERMODYNAMICS</strong> · SOIL-WATER MASS CONSERVATION</span>
-      <span>🧪 <strong>ISRIC SOILGRIDS v2.0</strong> · GLOBAL 250M N-P-K & PEDOTRANSFER</span>
-      <span>🛰️ <strong>MODIS NDVI SATELLITE</strong> · CANOPY OPTICAL CROSS-VALIDATION</span>
-      <span>🐘 <strong>NEON SERVERLESS POSTGRESQL</strong> · INSTANT PERSISTENCE</span>
-      <span>🌾 <strong>COGNITIA AGRO-INTELLIGENCE</strong> · ZERO HARDWARE PROBES NEEDED</span>
-      <span>⚡ <strong>FAO-56 THERMODYNAMICS</strong> · SOIL-WATER MASS CONSERVATION</span>
-      <span>🧪 <strong>ISRIC SOILGRIDS v2.0</strong> · GLOBAL 250M N-P-K & PEDOTRANSFER</span>
-      <span>🛰️ <strong>MODIS NDVI SATELLITE</strong> · CANOPY OPTICAL CROSS-VALIDATION</span>
-      <span>🐘 <strong>NEON SERVERLESS POSTGRESQL</strong> · INSTANT PERSISTENCE</span>
-    </div>
-  </div>
+<body class="minimal-body">
 
   <!-- Loading Screen -->
   <div id="loading-screen" class="loading-screen">
-    <div class="loading-card-brutal">
-      <div class="sticker-badge-top">LET'S GROW! 🌻</div>
-      <div class="loading-icon-brutal">🌱</div>
-      <h2 class="loading-title-brutal">COGNITIA</h2>
-      <p class="loading-subtitle-brutal">Booting Physics & Pedotransfer Engine...</p>
-      <div class="loading-bar-brutal">
-        <div class="loading-bar-fill"></div>
+    <div class="loading-minimal-card">
+      <div class="loading-spinner-minimal"></div>
+      <div class="loading-brand">
+        <span class="brand-serif">COGNITIA</span>
+        <span class="brand-sub">Agro-Hydrology Engine</span>
       </div>
+      <p class="loading-text">Initializing physics models & global soil telemetry...</p>
     </div>
   </div>
 
   <!-- Disclaimer Modal -->
   <div id="disclaimer-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-card-brutal">
-      <div class="modal-header-brutal">
-        <span class="mhb-tag">⚠️ IMPORTANT NOTICE</span>
-        <span class="mhb-stamp">VERIFIED</span>
+    <div class="modal-minimal-card">
+      <div class="modal-header-minimal">
+        <span class="modal-pill-tag">Scientific Methodology</span>
+        <button id="disclaimer-close-x" class="modal-close-btn" onclick="document.getElementById('disclaimer-modal').style.display='none'">✕</button>
       </div>
-      <h3>Agricultural Advisory Disclaimer</h3>
-      <div class="modal-body-brutal">
-        <p>COGNITIA provides high-precision decision intelligence combining weather grids, ISRIC SoilGrids, and satellite remote sensing. It is <strong>not a substitute</strong> for on-ground agronomic inspection.</p>
-        <ul class="brutal-bullet-list">
-          <li><strong>Physics-Driven:</strong> Recommendations follow FAO-56 and FAO-33 scientific frameworks.</li>
-          <li><strong>Yield Projections:</strong> Estimates are indicative of water-deficit conditions.</li>
-          <li><strong>Validate Locally:</strong> Always inspect local soil moisture before applying heavy water.</li>
+      <h3 class="modal-title-serif">Agricultural Advisory Disclaimer</h3>
+      <div class="modal-body-minimal">
+        <p>COGNITIA produces plot-level water deficit estimates through FAO-56 conservation of mass modeling, ISRIC SoilGrids 250m machine learning soil layers, and NASA MODIS satellite remote sensing.</p>
+        <ul class="modal-list-minimal">
+          <li><strong>Physics-Driven:</strong> Simulations follow literature-grounded FAO-56 & FAO-33 equations.</li>
+          <li><strong>Decision Support:</strong> Field conditions should be validated prior to applying heavy irrigation.</li>
+          <li><strong>Zero Hardware:</strong> Computes root-zone dynamics without requiring in-situ capacitance probes.</li>
         </ul>
       </div>
-      <button id="disclaimer-accept" class="btn-brutal btn-yellow btn-full">
-        <span>I UNDERSTAND — ENTER COGNITIA 🚀</span>
+      <button id="disclaimer-accept" class="btn-minimal btn-black btn-full">
+        <span>Enter Platform ➔</span>
       </button>
     </div>
   </div>
 
   <!-- Saved Fields Modal (Neon DB) -->
   <div id="saved-fields-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-card-brutal modal-large">
-      <div class="modal-header-brutal">
+    <div class="modal-minimal-card modal-large">
+      <div class="modal-header-minimal">
         <div style="display:flex;align-items:center;gap:10px;">
-          <span class="mhb-tag" style="background:#a7f3d0;color:#064e3b;">🐘 NEON DB PERSISTENCE</span>
-          <h3 style="margin:0;font-size:1.2rem;">My Saved Agricultural Fields</h3>
+          <span class="modal-pill-tag tag-emerald">Neon Serverless DB</span>
+          <h3 class="modal-title-serif" style="margin:0;font-size:1.3rem;">Saved Agricultural Parcels</h3>
         </div>
-        <button id="close-saved-modal" class="btn-close-brutal">✕</button>
+        <button id="close-saved-modal" class="modal-close-btn">✕</button>
       </div>
-      <div class="saved-fields-toolbar-brutal">
-        <span class="fields-count-badge" id="saved-fields-count">0 Saved Plots</span>
-        <button id="btn-new-plot-modal" class="btn-brutal btn-mint btn-sm">+ Plot New Field</button>
+      <div class="saved-toolbar-minimal">
+        <span class="saved-count-tag" id="saved-fields-count">0 Saved Plots</span>
+        <button id="btn-new-plot-modal" class="btn-minimal btn-black btn-sm">+ Plot New Field</button>
       </div>
-      <div id="saved-fields-list" class="saved-fields-grid-brutal">
-        <!-- Populated dynamically -->
+      <div id="saved-fields-list" class="saved-grid-minimal">
+        <!-- Injected dynamically -->
       </div>
     </div>
   </div>
 
-  <!-- ===== MAIN APPLICATION WRAPPER ===== -->
-  <div id="app" class="app-wrap">
-    
-    <!-- Top Neo-Brutalist Navigation -->
-    <header class="neo-header">
-      <div class="nh-left">
-        <div class="nh-brand">
-          <div class="nh-logo-box">
-            <span>🌾</span>
-          </div>
-          <div>
-            <h1 class="nh-title">COGNITIA</h1>
-            <span class="nh-badge-mini">NEO-AGRO v2.5</span>
-          </div>
-        </div>
-      </div>
+  <!-- ===== APPLICATION SHELL ===== -->
+  <div id="app" class="app-container">
 
-      <nav class="nh-nav">
-        <a href="#hero-section" class="nh-link active"><span class="nh-icon">⚡</span> Manifesto</a>
-        <a href="#science-section" class="nh-link"><span class="nh-icon">🔬</span> The Science</a>
-        <a href="#command-deck" class="nh-link"><span class="nh-icon">🛰️</span> Command Deck</a>
-        <a href="#" id="nav-my-fields" class="nh-link"><span class="nh-icon">📁</span> My Fields</a>
-      </nav>
-
-      <div class="nh-right">
-        <div class="neon-indicator-brutal" id="neon-status-badge" title="Neon Serverless PostgreSQL Live">
-          <span class="neon-dot-brutal"></span>
-          <span>NEON CLOUD ACTIVE</span>
+    <!-- Minimalist Sticky Header -->
+    <header class="minimal-header">
+      <div class="header-inner">
+        
+        <!-- Left: Brand -->
+        <div class="header-left">
+          <a href="#" class="brand-link">
+            <span class="brand-name-serif">COGNITIA<sup>®</sup></span>
+          </a>
+          <div class="brand-divider"></div>
+          <span class="brand-meta-badge">Agro-Hydrology</span>
         </div>
-        <button class="nh-btn-action" id="header-launch-btn" onclick="document.getElementById('command-deck').scrollIntoView({behavior:'smooth'})">
-          <span>ANALYZE FIELD ➔</span>
-        </button>
+
+        <!-- Center: Minimal Nav -->
+        <nav class="header-center-nav">
+          <a href="#hero" class="nav-item active">Overview</a>
+          <a href="#methodology" class="nav-item">Methodology</a>
+          <a href="#command-center" class="nav-item">Command Center</a>
+          <a href="#" id="nav-my-fields" class="nav-item">My Fields</a>
+        </nav>
+
+        <!-- Right: Actions -->
+        <div class="header-right">
+          <div class="neon-pill-minimal" id="neon-status-badge" title="Neon Serverless PostgreSQL Live">
+            <span class="neon-dot-pulse"></span>
+            <span>Neon DB</span>
+          </div>
+          <button class="btn-minimal btn-black btn-sm" onclick="document.getElementById('command-center').scrollIntoView({behavior:'smooth'})">
+            <span>Analyze Field ↗</span>
+          </button>
+        </div>
+
       </div>
     </header>
 
-    <!-- ===== SECTION 1: HERO SCROLLYTELLING (BOLD. PLAYFUL. SCIENTIFIC.) ===== -->
-    <section id="hero-section" class="neo-hero-section">
-      <div class="hero-grid">
-        <!-- Left: Big Typography & Value Props -->
-        <div class="hero-left">
-          <div class="hero-sticker-row">
-            <span class="sticker-pill sticker-yellow">HAVE A GREEN DAY 🌻</span>
-            <span class="sticker-pill sticker-pink">LET'S GO! 🚀</span>
-            <span class="sticker-pill sticker-mint">ZERO SENSORS ⚡</span>
-          </div>
-
-          <h1 class="hero-giant-title">
-            FARM LIKE IT'S <span class="highlight-orange">2026.</span>
-            <span class="title-sub-row">SMART. PHYSICAL. <span class="highlight-cyan">UNAPOLOGETIC.</span></span>
-          </h1>
-
-          <p class="hero-lead-text">
-            No $500 buried probes that corrode in the mud. No cloud-blocked optical guesswork. 
-            COGNITIA marries <strong>FAO-56 Soil Thermodynamics</strong> with <strong>ISRIC Global SoilGrids</strong> 
-            and <strong>MODIS Satellite Reflectance</strong> into an uncompromising plot-level precision intelligence deck.
-          </p>
-
-          <div class="hero-action-buttons">
-            <button class="btn-brutal btn-yellow btn-xl" onclick="document.getElementById('command-deck').scrollIntoView({behavior:'smooth'})">
-              <span>EXPLORE COMMAND DECK 🚜</span>
-            </button>
-            <button class="btn-brutal btn-white btn-xl" onclick="document.getElementById('science-section').scrollIntoView({behavior:'smooth'})">
-              <span>HOW IT WORKS 🔬</span>
-            </button>
-          </div>
-
-          <!-- Hero Metrics Strips -->
-          <div class="hero-metrics-strip">
-            <div class="hm-item">
-              <span class="hm-val">250m</span>
-              <span class="hm-label">Global Soil Grid</span>
-            </div>
-            <div class="hm-item">
-              <span class="hm-val">97 Days</span>
-              <span class="hm-label">Water Audit Ledger</span>
-            </div>
-            <div class="hm-item">
-              <span class="hm-val">8 Charts</span>
-              <span class="hm-label">Biometric Analytics</span>
-            </div>
-            <div class="hm-item">
-              <span class="hm-val">100%</span>
-              <span class="hm-label">Physics Grounded</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Neo-Brutalist Sticker Card Graphic -->
-        <div class="hero-right">
-          <div class="neo-illustration-card">
-            <div class="nic-sticker-star">⭐ VERIFIED</div>
-            <div class="nic-sticker-badge">98% ACCURACY 🌾</div>
-            <img src="./images/neo_farmer_sticker.jpg" alt="Neo-Brutalist Progressive Farmer" class="nic-img" />
-            <div class="nic-footer">
-              <div class="nic-footer-left">
-                <strong>DIGITAL CANOPY COCKPIT</strong>
-                <span>Real-Time Soil Water & Yield Loss Engine</span>
-              </div>
-              <span class="nic-badge-live">LIVE HUD</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== SECTION 2: 4-STEP SCIENCE FLOW (SCROLLYTELLING) ===== -->
-    <section id="science-section" class="neo-science-section">
-      <div class="section-title-wrap">
-        <span class="section-tag-pill">THE SECRET SAUCE</span>
-        <h2 class="section-display-title">HOW COGNITIA DECIDES WHEN TO IRRIGATE</h2>
-        <p class="section-sub-text">A deterministic 4-stage physics pipeline. No black-box hallucinations.</p>
-      </div>
-
-      <div class="science-cards-grid">
-        <!-- Step 1 -->
-        <div class="science-card sc-yellow">
-          <div class="sc-number">01</div>
-          <div class="sc-icon">🧪</div>
-          <h3 class="sc-title">ISRIC SoilGrids AI</h3>
-          <p class="sc-desc">Queries global 250m machine learning soil layers across 6 depths to extract exact Sand %, Clay %, SOC, Total Nitrogen, pH, and CEC.</p>
-          <div class="sc-tag">Saxton-Rawls PTF</div>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="science-card sc-pink">
-          <div class="sc-number">02</div>
-          <div class="sc-icon">⚡</div>
-          <h3 class="sc-title">FAO-56 Mass Balance</h3>
-          <p class="sc-desc">Simulates daily root-zone soil water storage $\theta(t)$ with effective rainfall infiltration, dynamic root depth $Z_r(t)$, and $K_s$ stomatal stress.</p>
-          <div class="sc-tag">Conservation of Mass</div>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="science-card sc-cyan">
-          <div class="sc-number">03</div>
-          <div class="sc-icon">🛰️</div>
-          <h3 class="sc-title">MODIS Cross-Validation</h3>
-          <p class="sc-desc">Cross-references physical stress against satellite canopy greenness in a $2\times2$ matrix to distinguish true water deficits from pest/disease rust.</p>
-          <div class="sc-tag">Dual-Source Truth</div>
-        </div>
-
-        <!-- Step 4 -->
-        <div class="science-card sc-mint">
-          <div class="sc-number">04</div>
-          <div class="sc-icon">💧</div>
-          <h3 class="sc-title">Net Deficit Action</h3>
-          <p class="sc-desc">Generates exact millimeter refill requirements with efficiency-adjusted gross volumes for Drip (90%) and Surface (65%) irrigation systems.</p>
-          <div class="sc-tag">Actionable Prescription</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== SECTION 3: INTERACTIVE AGRO COMMAND DECK ===== -->
-    <section id="command-deck" class="neo-command-section">
-      <div class="section-title-wrap">
-        <span class="section-tag-pill" style="background:#ffd166;color:#111;">THE COCKPIT</span>
-        <h2 class="section-display-title">PLOT YOUR FIELD & SIMULATE WATER DYNAMICS</h2>
-      </div>
-
-      <!-- Main Interactive Deck Layout -->
-      <div class="deck-grid">
+    <!-- ===== SECTION 1: EDITORIAL HERO (MINIMAL SAAS) ===== -->
+    <section id="hero" class="minimal-hero-section">
+      <div class="hero-content-wrap">
         
-        <!-- Left: Map Deck -->
-        <aside class="deck-map-panel">
+        <!-- Pill Tag -->
+        <div class="hero-top-badge">
+          <span class="badge-dot"></span>
+          <span>Zero-Hardware Crop Water Stress Intelligence</span>
+        </div>
+
+        <!-- Headline with Editorial Serif + Sans Combo -->
+        <h1 class="hero-headline-serif">
+          Predict Water Stress <em>Before</em><br />
+          Yield Loss Strikes.
+        </h1>
+
+        <!-- Subheading -->
+        <p class="hero-subtext">
+          We combine <strong>FAO-56 Soil Thermodynamics</strong>, <strong>ISRIC Global SoilGrids 250m</strong>, 
+          and <strong>NASA MODIS Satellite Reflectance</strong> into an explainable, plot-level precision engine.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="hero-cta-group">
+          <button class="btn-minimal btn-black btn-lg" onclick="document.getElementById('command-center').scrollIntoView({behavior:'smooth'})">
+            <span>Launch Command Center ↗</span>
+          </button>
+          <button class="btn-minimal btn-outline btn-lg" onclick="document.getElementById('methodology').scrollIntoView({behavior:'smooth'})">
+            <span>Read Methodology</span>
+          </button>
+        </div>
+
+        <!-- Editorial Stipple Artwork Card (Creation Hand of Ag-Tech) -->
+        <div class="hero-artwork-frame">
+          <img src="./images/minimal_hero_creation.jpg" alt="Minimalist Editorial Agro-Tech Illustration" class="hero-artwork-img" />
+          <div class="artwork-caption-strip">
+            <span class="caption-label">FIGURE 1.0</span>
+            <span class="caption-text">Deterministic Soil Mechanics × Satellite Optical Canopy Telemetry</span>
+          </div>
+        </div>
+
+        <!-- Trusted Authorities Strip -->
+        <div class="authorities-strip">
+          <span class="authorities-title">POWERED BY GLOBAL SCIENTIFIC DATA INFRASTRUCTURE</span>
+          <div class="authorities-logos">
+            <span class="auth-pill">🇺🇳 FAO Penman–Monteith</span>
+            <span class="auth-pill">🧪 ISRIC SoilGrids 250m</span>
+            <span class="auth-pill">🛰️ NASA MODIS Terra</span>
+            <span class="auth-pill">🌦️ ECMWF / Open-Meteo</span>
+            <span class="auth-pill">🐘 Neon PostgreSQL</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SECTION 2: 4-STEP SCIENTIFIC METHODOLOGY ===== -->
+    <section id="methodology" class="minimal-methodology-section">
+      <div class="section-container">
+        
+        <div class="section-header-centered">
+          <span class="section-badge-pill">Deterministic Pipeline</span>
+          <h2 class="section-serif-title">How the Physics Engine Works</h2>
+          <p class="section-sans-subtitle">A closed-loop physical simulation. Mass conservation without hardware probes.</p>
+        </div>
+
+        <div class="methodology-cards-grid">
+          <!-- Step 1 -->
+          <div class="method-card">
+            <div class="method-num">01</div>
+            <div class="method-icon-wrap">🧪</div>
+            <h3 class="method-title">ISRIC SoilGrids 250m</h3>
+            <p class="method-desc">Retrieves machine learning-derived physical and chemical layers (Sand, Clay, SOC, Nitrogen, pH, CEC) to compute pedotransfer limits.</p>
+            <div class="method-footer-tag">Saxton–Rawls Equations</div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="method-card">
+            <div class="method-num">02</div>
+            <div class="method-icon-wrap">⚡</div>
+            <h3 class="method-title">FAO-56 Mass Balance</h3>
+            <p class="method-desc">Simulates daily root-zone soil water storage $\theta(t)$ with effective rainfall infiltration, dynamic root depth $Z_r(t)$, and $K_s$ stomatal stress.</p>
+            <div class="method-footer-tag">Mass Conservation</div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="method-card">
+            <div class="method-num">03</div>
+            <div class="method-icon-wrap">🛰️</div>
+            <h3 class="method-title">MODIS Cross-Validation</h3>
+            <p class="method-desc">Cross-references physical stress against satellite canopy greenness in a $2\times2$ matrix to distinguish true water deficits from disease or pests.</p>
+            <div class="method-footer-tag">Dual-Source Agreement</div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="method-card">
+            <div class="method-num">04</div>
+            <div class="method-icon-wrap">💧</div>
+            <h3 class="method-title">Net Deficit Action</h3>
+            <p class="method-desc">Prescribes exact net root-zone deficit millimeters ($I_{\text{net}} = \text{FC} - \theta$) with efficiency conversions for Drip and Surface systems.</p>
+            <div class="method-footer-tag">Yield Loss Protection</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== SECTION 3: INTERACTIVE AGRO COMMAND CENTER ===== -->
+    <section id="command-center" class="minimal-command-section">
+      <div class="section-container">
+        
+        <div class="section-header-left">
+          <span class="section-badge-pill">Interactive Cockpit</span>
+          <h2 class="section-serif-title">Plot Field & Run Water Balance</h2>
+          <p class="section-sans-subtitle">Select or draw any parcel globally. Live pedotransfer characteristics update automatically.</p>
+        </div>
+
+        <!-- 2-Column Command Grid -->
+        <div class="command-grid-layout">
           
-          <!-- Search & GPS Bar -->
-          <div class="deck-search-row">
-            <div class="search-input-wrap">
-              <span class="search-icon">🔍</span>
-              <input type="text" id="search-input" placeholder="Search village, district, or coordinates..." />
-            </div>
-            <button id="locate-btn" class="btn-brutal btn-mint" title="Acquire GPS coordinates">
-              <span>📍 GPS</span>
-            </button>
-          </div>
-
-          <!-- Location Badge -->
-          <div class="location-strip-brutal" id="map-location-badge">
-            <span class="loc-pin">📍</span>
-            <span class="loc-text" id="loc-name-text">Loading location...</span>
-          </div>
-
-          <!-- Presets -->
-          <div class="presets-row-brutal">
-            <span class="presets-label">⚡ PRESETS:</span>
-            <button class="preset-pill active" data-lat="30.55" data-lng="76.45" data-crop="wheat" data-name="Punjab Wheat Field">🌾 Punjab</button>
-            <button class="preset-pill" data-lat="19.75" data-lng="75.71" data-crop="sugarcane" data-name="Maharashtra Cane">🎋 MH</button>
-            <button class="preset-pill" data-lat="21.52" data-lng="70.45" data-crop="groundnut" data-name="Gujarat Groundnut">🥜 GJ</button>
-            <button class="preset-pill" data-lat="42.03" data-lng="-93.63" data-crop="maize" data-name="Iowa Corn Belt">🌽 US</button>
-          </div>
-
-          <!-- Map Box -->
-          <div class="map-box-brutal">
-            <div id="map" class="map-element"></div>
-
-            <!-- Floating Draw Badge -->
-            <div id="draw-instruction-badge" class="floating-instruction hidden">
-              <span>✏️ Click map corners to plot field boundary. Double-click to complete.</span>
-            </div>
-
-            <!-- Floating Draw Action Toolbar -->
-            <div id="draw-floating-toolbar" class="floating-draw-toolbar hidden">
-              <button id="draw-btn-finish" class="btn-brutal btn-mint btn-sm" disabled>
-                <span>✓ Finish Plot</span>
-              </button>
-              <button id="draw-btn-undo" class="btn-brutal btn-yellow btn-sm" disabled>
-                <span>↶ Undo</span>
-              </button>
-              <button id="draw-btn-cancel" class="btn-brutal btn-white btn-sm">
-                <span>✕ Cancel</span>
-              </button>
-            </div>
-
-            <!-- Floating Area Badge -->
-            <div id="map-area-badge" class="floating-area-badge hidden">
-              <span>📐 <strong id="map-area-val">0.00 Acres</strong></span>
-            </div>
-          </div>
-
-          <!-- Map Tools Strip -->
-          <div class="map-tools-brutal">
-            <div class="tools-left">
-              <button class="map-tool-btn active" id="tool-cursor" title="Inspect Mode">
-                <span>🎯 Pin</span>
-              </button>
-              <button class="map-tool-btn" id="tool-detect-fields" title="Auto-Detect OSM Parcels">
-                <span>🌾 OSM Fields</span>
-              </button>
-              <button class="map-tool-btn" id="tool-polygon" title="Draw Plot Boundary">
-                <span>✏️ Draw Plot</span>
-              </button>
-              <button class="map-tool-btn" id="tool-delete" title="Clear Plot">
-                <span>🗑️ Clear</span>
-              </button>
-            </div>
-            <button class="map-tool-btn" id="tool-fullscreen" title="Toggle Fullscreen">
-              <span id="fullscreen-label">⛶ Expand</span>
-            </button>
-          </div>
-
-          <!-- Coordinates Strip -->
-          <div class="coord-strip-brutal">
-            <div class="coord-item">
-              <label>LAT</label>
-              <input type="number" id="lat-input" step="0.0001" value="30.55" />
-            </div>
-            <div class="coord-item">
-              <label>LNG</label>
-              <input type="number" id="lng-input" step="0.0001" value="76.45" />
-            </div>
-            <button id="go-to-coords" class="btn-brutal btn-yellow btn-sm">GO</button>
-          </div>
-        </aside>
-
-        <!-- Right: Setup, Soil Diagnostics & Execution Deck -->
-        <main class="deck-main-panel">
-          
-          <!-- State 1: Configuration Deck -->
-          <div id="setup-panel">
+          <!-- Left Column: Map Deck -->
+          <aside class="map-deck-card">
             
-            <!-- Active Field Bar -->
-            <div class="field-bar-brutal">
-              <div class="fb-left">
-                <div class="fb-icon-box">🌾</div>
-                <div>
-                  <div class="fb-name-row">
-                    <span class="fb-name">Field 1</span>
-                    <button class="edit-icon" title="Rename">✏️</button>
-                  </div>
-                  <span class="fb-meta">
-                    <span id="field-crop-label">Wheat</span> · 
-                    <span id="field-area-label">—</span> · 
-                    <span id="field-location-label">Select on map</span>
-                  </span>
-                </div>
+            <!-- Search & GPS -->
+            <div class="map-search-bar">
+              <div class="search-field">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" placeholder="Search village, region, coordinates..." />
               </div>
-              <div class="fb-right">
-                <div class="sowing-chip-brutal">
-                  <span class="scb-label">SOWING DATE:</span>
-                  <strong class="scb-val" id="sowing-date-display">—</strong>
-                </div>
-                <button id="save-field-btn" class="btn-brutal btn-mint btn-sm" title="Save field to Neon PostgreSQL">
-                  <span>💾 Save Field</span>
+              <button id="locate-btn" class="btn-minimal btn-outline btn-icon" title="Use GPS Location">
+                <span>📍 GPS</span>
+              </button>
+            </div>
+
+            <!-- Location Meta -->
+            <div class="location-badge-minimal" id="map-location-badge">
+              <span class="loc-indicator"></span>
+              <span class="loc-text" id="loc-name-text">Loading location...</span>
+            </div>
+
+            <!-- Presets Strip -->
+            <div class="presets-strip-minimal">
+              <span class="presets-caption">Presets:</span>
+              <button class="preset-chip active" data-lat="30.55" data-lng="76.45" data-crop="wheat" data-name="Punjab Wheat Field">🌾 Punjab</button>
+              <button class="preset-chip" data-lat="19.75" data-lng="75.71" data-crop="sugarcane" data-name="Maharashtra Cane">🎋 Maharashtra</button>
+              <button class="preset-chip" data-lat="21.52" data-lng="70.45" data-crop="groundnut" data-name="Gujarat Groundnut">🥜 Gujarat</button>
+              <button class="preset-chip" data-lat="42.03" data-lng="-93.63" data-crop="maize" data-name="Iowa Corn Belt">🌽 US Corn</button>
+            </div>
+
+            <!-- Map Container -->
+            <div class="map-frame-minimal">
+              <div id="map" class="map-canvas"></div>
+
+              <!-- Floating Instructions -->
+              <div id="draw-instruction-badge" class="floating-instruction-minimal hidden">
+                <span>✏️ Click corners to draw field boundary. Double-click to complete.</span>
+              </div>
+
+              <!-- Floating Draw Action Toolbar -->
+              <div id="draw-floating-toolbar" class="floating-draw-toolbar-minimal hidden">
+                <button id="draw-btn-finish" class="btn-minimal btn-black btn-sm" disabled>
+                  <span>✓ Finish Plot</span>
+                </button>
+                <button id="draw-btn-undo" class="btn-minimal btn-outline btn-sm" disabled>
+                  <span>↶ Undo</span>
+                </button>
+                <button id="draw-btn-cancel" class="btn-minimal btn-outline btn-sm">
+                  <span>✕ Cancel</span>
                 </button>
               </div>
-            </div>
 
-            <!-- Parameter Configuration Grid -->
-            <div class="config-grid-brutal">
-              <div class="config-card-brutal">
-                <label class="cc-label">🌾 CROP TYPE</label>
-                <select id="crop-select" class="config-select-brutal">
-                  <option value="rice">🌾 Rice (Paddy)</option>
-                  <option value="wheat" selected>🌾 Wheat</option>
-                  <option value="maize">🌽 Maize (Corn)</option>
-                  <option value="cotton">🏵️ Cotton</option>
-                  <option value="sugarcane">🎋 Sugarcane</option>
-                  <option value="soybean">🫘 Soybean</option>
-                  <option value="groundnut">🥜 Groundnut</option>
-                </select>
-              </div>
-
-              <div class="config-card-brutal">
-                <label class="cc-label">📅 SOWING / PLANTING DATE</label>
-                <input type="date" id="planting-date" class="config-input-brutal" />
-              </div>
-
-              <div class="config-card-brutal">
-                <label class="cc-label">🌱 GROWTH STAGE</label>
-                <div class="stage-badge-brutal" id="growth-stage-display">—</div>
-              </div>
-
-              <div class="config-card-brutal">
-                <label class="cc-label">🧪 SOIL PROFILE SOURCE</label>
-                <select id="soil-select" class="config-select-brutal">
-                  <option value="auto" selected>🛰️ Live ISRIC SoilGrids 250m</option>
-                  <option value="sand">Sand</option>
-                  <option value="loamy_sand">Loamy Sand</option>
-                  <option value="sandy_loam">Sandy Loam</option>
-                  <option value="loam">Loam</option>
-                  <option value="silt_loam">Silt Loam</option>
-                  <option value="clay_loam">Clay Loam</option>
-                  <option value="silty_clay">Silty Clay</option>
-                  <option value="clay">Clay</option>
-                </select>
+              <!-- Floating Area Badge -->
+              <div id="map-area-badge" class="floating-area-badge-minimal hidden">
+                <span>📐 <strong id="map-area-val">0.00 Acres</strong></span>
               </div>
             </div>
 
-            <!-- Live Soil Physical Classification Card -->
-            <div class="soil-card-brutal" id="soil-profile-card">
-              <div class="sc-header-brutal">
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <span class="sc-icon-badge">🧱</span>
-                  <div>
-                    <h4 class="sc-title-brutal">Physical Soil Classification</h4>
-                    <span class="sc-sub-brutal" id="soil-source-tag">ISRIC SoilGrids v2.0 Global 250m Resolution</span>
-                  </div>
-                </div>
-                <span class="soil-badge-pill" id="soil-type-badge">Analyzing Texture...</span>
+            <!-- Map Tool Strip -->
+            <div class="map-actions-bar">
+              <div class="map-tools-group">
+                <button class="tool-btn active" id="tool-cursor" title="Inspect Mode">
+                  <span>🎯 Pin</span>
+                </button>
+                <button class="tool-btn" id="tool-detect-fields" title="Auto-Detect OSM Parcels">
+                  <span>🌾 OSM Fields</span>
+                </button>
+                <button class="tool-btn" id="tool-polygon" title="Draw Plot Boundary">
+                  <span>✏️ Draw Plot</span>
+                </button>
+                <button class="tool-btn" id="tool-delete" title="Clear Plot">
+                  <span>🗑️ Clear</span>
+                </button>
               </div>
-
-              <!-- Texture Stack Bar -->
-              <div class="texture-bar-wrap-brutal">
-                <div class="texture-bar-brutal">
-                  <div class="tb-seg tb-sand" id="st-sand-bar" style="width: 27%;"></div>
-                  <div class="tb-seg tb-silt" id="st-silt-bar" style="width: 38%;"></div>
-                  <div class="tb-seg tb-clay" id="st-clay-bar" style="width: 35%;"></div>
-                </div>
-                <div class="texture-legend-brutal">
-                  <span><span class="dot dot-sand"></span> Sand: <strong id="st-sand-val">27%</strong></span>
-                  <span><span class="dot dot-silt"></span> Silt: <strong id="st-silt-val">38%</strong></span>
-                  <span><span class="dot dot-clay"></span> Clay: <strong id="st-clay-val">35%</strong></span>
-                  <span><span class="dot dot-soc"></span> SOC: <strong id="st-soc-val">15.6 g/kg</strong></span>
-                </div>
-              </div>
-
-              <!-- Hydraulic Parameters Mini Grid -->
-              <div class="hydraulic-metrics-grid">
-                <div class="hm-box">
-                  <span class="hm-lbl">Field Capacity (FC)</span>
-                  <strong class="hm-num" id="smm-fc">340 mm/m</strong>
-                </div>
-                <div class="hm-box">
-                  <span class="hm-lbl">Wilting Point (PWP)</span>
-                  <strong class="hm-num" id="smm-pwp">190 mm/m</strong>
-                </div>
-                <div class="hm-box">
-                  <span class="hm-lbl">Root Capacity (TAW)</span>
-                  <strong class="hm-num" id="smm-taw">90 mm</strong>
-                </div>
-                <div class="hm-box">
-                  <span class="hm-lbl">Safe Limit (RAW)</span>
-                  <strong class="hm-num text-orange" id="smm-raw">45 mm</strong>
-                </div>
-              </div>
+              <button class="tool-btn" id="tool-fullscreen" title="Toggle Fullscreen">
+                <span id="fullscreen-label">⛶ Expand</span>
+              </button>
             </div>
 
-            <!-- Live Soil Nutrients & Chemical Health Card -->
-            <div class="soil-card-brutal" id="soil-nutrients-card">
-              <div class="sc-header-brutal">
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <span class="sc-icon-badge">🌱</span>
-                  <div>
-                    <h4 class="sc-title-brutal">Soil Nutrients & Chemical Fertility</h4>
-                    <span class="sc-sub-brutal" id="nutrient-source-tag">ISRIC SoilGrids Nitrogen, pH & Cation Buffer</span>
-                  </div>
-                </div>
-                <span class="nutrient-badge-pill" id="sn-overall-badge">Optimal Fertility</span>
+            <!-- Coordinates Row -->
+            <div class="coords-row-minimal">
+              <div class="coord-field">
+                <label>LAT</label>
+                <input type="number" id="lat-input" step="0.0001" value="30.55" />
               </div>
-
-              <!-- 4-Box Chemical Grid -->
-              <div class="chem-grid-brutal">
-                <div class="chem-box">
-                  <div class="cb-head">
-                    <span>Total Nitrogen (N)</span>
-                    <span class="cb-pill" id="sn-n-badge">Optimal</span>
-                  </div>
-                  <div class="cb-val-row">
-                    <strong class="cb-val" id="sn-n-val">1.35 g/kg</strong>
-                    <span class="cb-unit">N (tot)</span>
-                  </div>
-                  <div class="cb-bar"><div class="cb-bar-fill fill-mint" id="sn-n-bar" style="width:65%;"></div></div>
-                </div>
-
-                <div class="chem-box">
-                  <div class="cb-head">
-                    <span>Soil pH (H₂O)</span>
-                    <span class="cb-pill" id="sn-ph-badge">Optimal (6.8)</span>
-                  </div>
-                  <div class="cb-val-row">
-                    <strong class="cb-val" id="sn-ph-val">6.8 pH</strong>
-                    <span class="cb-unit">Acidity</span>
-                  </div>
-                  <div class="cb-bar"><div class="cb-bar-fill fill-cyan" id="sn-ph-bar" style="width:68%;"></div></div>
-                </div>
-
-                <div class="chem-box">
-                  <div class="cb-head">
-                    <span>Cation Buffer (CEC)</span>
-                    <span class="cb-pill" id="sn-cec-badge">Good K+ Buffer</span>
-                  </div>
-                  <div class="cb-val-row">
-                    <strong class="cb-val" id="sn-cec-val">18.5 cmol/kg</strong>
-                    <span class="cb-unit">CEC</span>
-                  </div>
-                  <div class="cb-bar"><div class="cb-bar-fill fill-purple" id="sn-cec-bar" style="width:72%;"></div></div>
-                </div>
-
-                <div class="chem-box">
-                  <div class="cb-head">
-                    <span>C:N Ratio</span>
-                    <span class="cb-pill" id="sn-cn-badge">Balanced (11.8)</span>
-                  </div>
-                  <div class="cb-val-row">
-                    <strong class="cb-val" id="sn-cn-val">11.8</strong>
-                    <span class="cb-unit">SOC / N</span>
-                  </div>
-                  <div class="cb-bar"><div class="cb-bar-fill fill-orange" id="sn-cn-bar" style="width:60%;"></div></div>
-                </div>
+              <div class="coord-field">
+                <label>LNG</label>
+                <input type="number" id="lng-input" step="0.0001" value="76.45" />
               </div>
-
-              <!-- Agronomic Advice Row -->
-              <div class="nutrient-advice-brutal" id="nutrient-advice-box">
-                <div class="nab-row">
-                  <span>🧪 <strong>Phosphorus (P) Availability:</strong> <span id="sn-p-text">Peak Soluble Orthophosphate (optimal pH).</span></span>
-                </div>
-                <div class="nab-row">
-                  <span>🌾 <strong>Potassium (K) Retention:</strong> <span id="sn-k-text">Strong cation exchange capacity prevents rapid leaching.</span></span>
-                </div>
-                <div class="nab-row" id="sn-custom-advice-row">
-                  <span>💡 <strong>Fertility Guidance:</strong> <span id="sn-custom-advice">Balanced profile: Standard crop feeding schedule recommended.</span></span>
-                </div>
-              </div>
+              <button id="go-to-coords" class="btn-minimal btn-outline btn-sm">Go</button>
             </div>
 
-            <!-- Irrigation Records -->
-            <div class="irrigation-card-brutal">
-              <div class="ic-header">
-                <span>💧 RECENT IRRIGATION EVENTS</span>
-                <button id="add-irrigation" class="btn-brutal btn-white btn-sm">+ Add Event</button>
-              </div>
-              <div id="irrigation-list" class="irrigation-list-brutal">
-                <span class="irr-empty">No irrigation events logged yet</span>
-              </div>
-            </div>
+          </aside>
 
-            <!-- Big Bold Neo-Brutalist Analyze Button -->
-            <button id="analyze-btn" class="btn-brutal btn-yellow btn-analyze-huge">
-              <span>⚡ RUN CROP WATER STRESS ANALYSIS 🚜</span>
-            </button>
-          </div>
-
-          <!-- State 2: Stepper Pipeline Loader -->
-          <div id="loading-panel" style="display:none;" class="loading-stepper-panel">
-            <div class="stepper-card-brutal">
-              <div class="stepper-header-brutal">
-                <span class="shb-badge">EXECUTING PIPELINE</span>
-                <h3>Deterministic Physics Engine</h3>
-              </div>
-              <div class="stepper-list-brutal">
-                <div class="stepper-item" id="step-weather">
-                  <span class="step-num">1</span>
-                  <span>Fetching Open-Meteo High-Resolution 90d + 7d Weather Vectors</span>
-                </div>
-                <div class="stepper-item" id="step-soil">
-                  <span class="step-num">2</span>
-                  <span>Querying ISRIC SoilGrids 250m Global Texture & Chemical Layers</span>
-                </div>
-                <div class="stepper-item" id="step-satellite">
-                  <span class="step-num">3</span>
-                  <span>Retrieving NASA MODIS Multi-Spectral NDVI Canopy Reflectance</span>
-                </div>
-                <div class="stepper-item" id="step-model">
-                  <span class="step-num">4</span>
-                  <span>Executing FAO-56 Single-Bucket Conservation of Mass Simulation</span>
-                </div>
-                <div class="stepper-item" id="step-crossval">
-                  <span class="step-num">5</span>
-                  <span>Running Dual-Source Anomaly Cross-Validation Matrix</span>
-                </div>
-                <div class="stepper-item" id="step-advisory">
-                  <span class="step-num">6</span>
-                  <span>Computing FAO-33 Stage Yield Loss & Net Deficit Prescription</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- State 3: Results & Analytics Suite -->
-          <div id="results-panel" style="display:none;" class="results-deck-brutal">
+          <!-- Right Column: Crop, Soil, and Execution Controls -->
+          <main class="control-deck-card">
             
-            <!-- Result Field Meta -->
-            <div class="results-field-bar">
-              <div>
-                <span class="rfb-title">PARCEL AUDIT REPORT</span>
-                <span class="rfb-meta" id="results-field-meta">—</span>
-              </div>
-              <div class="rfb-sowing">
-                <span>PLANTED:</span>
-                <strong id="results-sowing-date">—</strong>
-              </div>
-            </div>
-
-            <!-- ★ Main Advisory Banner -->
-            <div class="advisory-banner-brutal" id="advisory-banner">
-              <div class="ab-left">
-                <div class="ab-icon-box" id="advisory-icon">
-                  <!-- Injected dynamically -->
-                </div>
-                <div>
-                  <h2 id="advisory-headline">ANALYZING...</h2>
-                  <p id="advisory-subtext">Computing soil water balance...</p>
-                </div>
-              </div>
-              <div class="ab-right">
-                <div class="ab-stat-item">
-                  <span class="stat-lbl">WATER NEEDED IN:</span>
-                  <span class="stat-val" id="days-to-stress-val">—</span>
-                </div>
-                <div class="ab-stat-item">
-                  <span class="stat-lbl">PROJECTED YIELD LOSS:</span>
-                  <span class="stat-val text-orange" id="yield-loss-val">—</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- ★ 4 Neo-Brutalist Metric Cards -->
-            <div class="metrics-grid-brutal">
-              <!-- Metric 1: Cyan -->
-              <div class="metric-card-brutal mc-cyan">
-                <div class="mc-head">
-                  <span class="mc-icon">💧</span>
-                  <span class="mc-title">SOIL WATER NOW</span>
-                </div>
-                <span class="mc-num" id="mc-soil-water">—</span>
-                <div class="mc-progress-wrap">
-                  <div class="mc-progress-bar" id="mc-soil-bar" style="width:0%"></div>
-                </div>
-                <span class="mc-hint-text" id="mc-soil-hint">—</span>
-              </div>
-
-              <!-- Metric 2: Yellow -->
-              <div class="metric-card-brutal mc-yellow">
-                <div class="mc-head">
-                  <span class="mc-icon">⚠️</span>
-                  <span class="mc-title">SAFE LEVEL (RAW)</span>
-                </div>
-                <span class="mc-num" id="mc-safe-level">—</span>
-                <div class="mc-progress-wrap">
-                  <div class="mc-progress-bar" id="mc-safe-bar" style="width:0%"></div>
-                </div>
-                <span class="mc-hint-text" id="mc-safe-hint">—</span>
-              </div>
-
-              <!-- Metric 3: Pink -->
-              <div class="metric-card-brutal mc-pink">
-                <div class="mc-head">
-                  <span class="mc-icon">🌧️</span>
-                  <span class="mc-title">RAIN (NEXT 7 DAYS)</span>
-                </div>
-                <span class="mc-num" id="mc-rain-expected">—</span>
-                <span class="mc-hint-text" id="mc-rain-hint" style="margin-top:14px;">—</span>
-              </div>
-
-              <!-- Metric 4: Mint -->
-              <div class="metric-card-brutal mc-mint">
-                <div class="mc-head">
-                  <span class="mc-icon">🌾</span>
-                  <span class="mc-title">CROP ET (NEXT 7 DAYS)</span>
-                </div>
-                <span class="mc-num" id="mc-crop-et">—</span>
-                <span class="mc-hint-text" id="mc-et-hint" style="margin-top:14px;">—</span>
-              </div>
-            </div>
-
-            <!-- ★ Charts Grid Row 1 -->
-            <div class="charts-grid-row-brutal">
-              <!-- Chart 1 -->
-              <div class="chart-card-brutal">
-                <div class="ccb-header">
-                  <div>
-                    <h3 class="ccb-title">💧 Root-Zone Soil Water Dynamics</h3>
-                    <span class="ccb-sub">Daily water storage vs RAW threshold & Field Capacity (TAW)</span>
-                  </div>
-                  <span class="ccb-pill">FAO-56 Dual Kc</span>
-                </div>
-                <div class="chart-canvas-wrap">
-                  <canvas id="moisture-chart"></canvas>
-                </div>
-              </div>
-
-              <!-- Chart 2 -->
-              <div class="chart-card-brutal">
-                <div class="ccb-header">
-                  <div>
-                    <h3 class="ccb-title">📊 Water Inflows vs Outflows</h3>
-                    <span class="ccb-sub">Rain & Irrigation Inflow vs Crop ET & Deep Drainage Outflow</span>
-                  </div>
-                  <span class="ccb-pill">Water Flux Budget</span>
-                </div>
-                <div class="chart-canvas-wrap">
-                  <canvas id="inflow-outflow-chart"></canvas>
-                </div>
-              </div>
-            </div>
-
-            <!-- ★ Charts Grid Row 2 -->
-            <div class="charts-grid-row-brutal">
-              <!-- Chart 3 -->
-              <div class="chart-card-brutal">
-                <div class="ccb-header">
-                  <div>
-                    <h3 class="ccb-title">🌾 Crop Water Demand (ETc) & Kc Progression</h3>
-                    <span class="ccb-sub">Actual Crop ET (ETc) vs Reference ET (ET₀) across growth stages</span>
-                  </div>
-                  <span class="ccb-pill">Crop Evapotranspiration</span>
-                </div>
-                <div class="chart-canvas-wrap">
-                  <canvas id="etc-demand-chart"></canvas>
-                </div>
-              </div>
-
-              <!-- Chart 4: Satellite Panel -->
-              <div class="chart-card-brutal">
-                <div class="ccb-header">
-                  <div>
-                    <h3 class="ccb-title">🛰️ Satellite Vegetation Signal (MODIS NDVI)</h3>
-                    <span class="ccb-sub">Canopy greenness & biomass trend cross-validated against model</span>
-                  </div>
-                  <span class="ccb-pill" id="sat-status-pill">Satellite Validated</span>
-                </div>
-                <div class="sat-sub-card">
-                  <div class="sat-icon-wrap" id="sat-icon-wrap">
-                    <span>🛰️</span>
-                  </div>
-                  <div>
-                    <strong id="sat-headline" style="font-size:0.95rem;display:block;">Analyzing satellite data...</strong>
-                    <span id="sat-description" style="font-size:0.8rem;color:#4b5563;">—</span>
-                  </div>
-                </div>
-                <div class="chart-canvas-wrap chart-canvas-sm">
-                  <canvas id="ndvi-chart"></canvas>
-                </div>
-              </div>
-            </div>
-
-            <!-- ★ Charts Grid Row 3 -->
-            <div class="charts-grid-row-brutal">
-              <!-- Chart 5 -->
-              <div class="chart-card-brutal">
-                <div class="ccb-header">
-                  <div>
-                    <h3 class="ccb-title">🧪 Soil Fertility & Chemical Balance Radar</h3>
-                    <span class="ccb-sub">ISRIC SoilGrids N, P, K Buffer, pH, SOC & C:N balance web</span>
-                  </div>
-                  <span class="ccb-pill">Nutrient Web</span>
-                </div>
-                <div class="chart-canvas-wrap chart-canvas-sm">
-                  <canvas id="nutrient-radar-chart"></canvas>
-                </div>
-              </div>
-
-              <!-- Chart 6 -->
-              <div class="chart-card-brutal">
-                <div class="ccb-header">
-                  <div>
-                    <h3 class="ccb-title">🌡️ Thermal Microclimate & Heat-Stress Curve</h3>
-                    <span class="ccb-sub">Daily Max/Min Temperatures & Vapor Pressure Deficit (VPD)</span>
-                  </div>
-                  <span class="ccb-pill">Agro-Meteorology</span>
-                </div>
-                <div class="chart-canvas-wrap chart-canvas-sm">
-                  <canvas id="climate-temp-chart"></canvas>
-                </div>
-              </div>
-            </div>
-
-            <!-- ★ Cross-Validation & Yield Stage Row -->
-            <div class="charts-grid-row-brutal">
-              <!-- Cross-Validation Matrix -->
-              <div class="chart-card-brutal">
-                <div class="ccb-header">
-                  <div>
-                    <h3 class="ccb-title">🔀 Multi-Source Cross-Validation Matrix</h3>
-                    <span class="ccb-sub">Physics model vs Satellite NDVI sensor anomaly agreement</span>
-                  </div>
-                  <span class="ccb-pill" id="cv-badge-tag">Confidence: 92%</span>
-                </div>
-                <div id="cv-matrix" class="cv-matrix-wrap-brutal"></div>
-                <div id="cv-details" class="cv-details-text-brutal"></div>
-              </div>
-
-              <!-- Yield Loss by Stage -->
-              <div class="chart-card-brutal">
-                <div class="ccb-header">
-                  <div>
-                    <h3 class="ccb-title">⚠️ Yield-Loss Sensitivity by Growth Stage</h3>
-                    <span class="ccb-sub">FAO-33 yield reduction risk based on stage-specific Ky factors</span>
-                  </div>
-                  <span class="ccb-pill">FAO-33 Ky</span>
-                </div>
-                <div class="chart-canvas-wrap chart-canvas-sm">
-                  <canvas id="yield-chart"></canvas>
-                </div>
-              </div>
-            </div>
-
-            <!-- ★ Verbose Section: Phenological Timeline & Deep Diagnostics -->
-            <div class="verbose-section-brutal">
+            <!-- State 1: Setup Panel -->
+            <div id="setup-panel">
               
-              <!-- Crop Phenology Timeline -->
-              <div class="verbose-card-brutal">
-                <div class="vc-header-brutal">
-                  <div style="display:flex;align-items:center;gap:10px;">
-                    <span class="vc-icon">🌱</span>
+              <!-- Field Bar -->
+              <div class="field-meta-bar-minimal">
+                <div class="fmb-left">
+                  <span class="fmb-icon">🌾</span>
+                  <div>
+                    <div class="fmb-name-row">
+                      <span class="fmb-name">Field 1</span>
+                      <button class="edit-btn-minimal" title="Rename">✏️</button>
+                    </div>
+                    <span class="fmb-meta">
+                      <span id="field-crop-label">Wheat</span> · 
+                      <span id="field-area-label">—</span> · 
+                      <span id="field-location-label">Select on map</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="fmb-right">
+                  <div class="sowing-pill-minimal">
+                    <span class="spm-label">SOWING:</span>
+                    <strong class="spm-val" id="sowing-date-display">—</strong>
+                  </div>
+                  <button id="save-field-btn" class="btn-minimal btn-outline btn-sm" title="Save field to Neon PostgreSQL">
+                    <span>💾 Save Field</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Configuration Grid -->
+              <div class="config-grid-minimal">
+                <div class="config-item">
+                  <label class="config-label">CROP TYPE</label>
+                  <select id="crop-select" class="minimal-select">
+                    <option value="rice">🌾 Rice (Paddy)</option>
+                    <option value="wheat" selected>🌾 Wheat</option>
+                    <option value="maize">🌽 Maize (Corn)</option>
+                    <option value="cotton">🏵️ Cotton</option>
+                    <option value="sugarcane">🎋 Sugarcane</option>
+                    <option value="soybean">🫘 Soybean</option>
+                    <option value="groundnut">🥜 Groundnut</option>
+                  </select>
+                </div>
+
+                <div class="config-item">
+                  <label class="config-label">SOWING DATE</label>
+                  <input type="date" id="planting-date" class="minimal-input" />
+                </div>
+
+                <div class="config-item">
+                  <label class="config-label">GROWTH STAGE</label>
+                  <div class="stage-pill-minimal" id="growth-stage-display">—</div>
+                </div>
+
+                <div class="config-item">
+                  <label class="config-label">SOIL PROFILE SOURCE</label>
+                  <select id="soil-select" class="minimal-select">
+                    <option value="auto" selected>🛰️ Live ISRIC SoilGrids 250m</option>
+                    <option value="sand">Sand</option>
+                    <option value="loamy_sand">Loamy Sand</option>
+                    <option value="sandy_loam">Sandy Loam</option>
+                    <option value="loam">Loam</option>
+                    <option value="silt_loam">Silt Loam</option>
+                    <option value="clay_loam">Clay Loam</option>
+                    <option value="silty_clay">Silty Clay</option>
+                    <option value="clay">Clay</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Physical Soil Profile Card -->
+              <div class="soil-card-minimal" id="soil-profile-card">
+                <div class="scm-header">
+                  <div class="scm-title-group">
+                    <span class="scm-icon">🧪</span>
                     <div>
-                      <h4 class="vc-title">Phenological Crop Growth Stage Timeline</h4>
-                      <span class="vc-sub">Stage durations, rooting progression (Zr), and water stress sensitivity</span>
+                      <h4 class="scm-title">Physical Soil Classification</h4>
+                      <span class="scm-sub" id="soil-source-tag">ISRIC SoilGrids v2.0 Global 250m</span>
                     </div>
                   </div>
-                  <span class="vc-badge-pill" id="pheno-current-stage">Day 90 / 120</span>
+                  <span class="status-pill-emerald" id="soil-type-badge">Analyzing Soil...</span>
                 </div>
-                <div class="pheno-timeline-wrap-brutal" id="pheno-timeline-container">
-                  <!-- Populated dynamically -->
+
+                <!-- Texture Bar -->
+                <div class="texture-bar-wrap-minimal">
+                  <div class="texture-bar-minimal">
+                    <div class="tb-seg seg-sand" id="st-sand-bar" style="width: 27%;"></div>
+                    <div class="tb-seg seg-silt" id="st-silt-bar" style="width: 38%;"></div>
+                    <div class="tb-seg seg-clay" id="st-clay-bar" style="width: 35%;"></div>
+                  </div>
+                  <div class="texture-legend-minimal">
+                    <span><span class="legend-dot dot-sand"></span> Sand: <strong id="st-sand-val">27%</strong></span>
+                    <span><span class="legend-dot dot-silt"></span> Silt: <strong id="st-silt-val">38%</strong></span>
+                    <span><span class="legend-dot dot-clay"></span> Clay: <strong id="st-clay-val">35%</strong></span>
+                    <span><span class="legend-dot dot-soc"></span> SOC: <strong id="st-soc-val">15.6 g/kg</strong></span>
+                  </div>
+                </div>
+
+                <!-- Hydraulic Parameters -->
+                <div class="hydraulic-grid-minimal">
+                  <div class="hg-cell">
+                    <span class="hg-lbl">Field Capacity (FC)</span>
+                    <strong class="hg-val" id="smm-fc">340 mm/m</strong>
+                  </div>
+                  <div class="hg-cell">
+                    <span class="hg-lbl">Wilting Point (PWP)</span>
+                    <strong class="hg-val" id="smm-pwp">190 mm/m</strong>
+                  </div>
+                  <div class="hg-cell">
+                    <span class="hg-lbl">Root Water (TAW)</span>
+                    <strong class="hg-val" id="smm-taw">90 mm</strong>
+                  </div>
+                  <div class="hg-cell">
+                    <span class="hg-lbl">Safe Limit (RAW)</span>
+                    <strong class="hg-val text-emerald" id="smm-raw">45 mm</strong>
+                  </div>
                 </div>
               </div>
 
-              <!-- Deep Soil Physical & Chemical Diagnostic Specification -->
-              <div class="verbose-card-brutal">
-                <div class="vc-header-brutal">
-                  <div style="display:flex;align-items:center;gap:10px;">
-                    <span class="vc-icon">🔬</span>
+              <!-- Chemical Nutrients & Fertility Card -->
+              <div class="soil-card-minimal" id="soil-nutrients-card">
+                <div class="scm-header">
+                  <div class="scm-title-group">
+                    <span class="scm-icon">🌱</span>
                     <div>
-                      <h4 class="vc-title">Comprehensive Soil Physical & Chemical Diagnostic</h4>
-                      <span class="vc-sub">ISRIC SoilGrids 250m global root-zone pedotransfer calculations</span>
+                      <h4 class="scm-title">Soil Nutrients & Chemical Fertility</h4>
+                      <span class="scm-sub" id="nutrient-source-tag">ISRIC Nitrogen, pH & Cation Buffer</span>
                     </div>
                   </div>
-                  <span class="vc-badge-pill">ISRIC v2.0 Global</span>
+                  <span class="status-pill-emerald" id="sn-overall-badge">Optimal Fertility</span>
                 </div>
-                <div class="verbose-soil-grid-brutal" id="verbose-soil-grid">
-                  <!-- Populated dynamically -->
+
+                <!-- 4-Grid Chemical Metrics -->
+                <div class="chem-grid-minimal">
+                  <div class="chem-card">
+                    <div class="chem-card-head">
+                      <span>Total Nitrogen (N)</span>
+                      <span class="badge-mini" id="sn-n-badge">Optimal</span>
+                    </div>
+                    <div class="chem-card-val-row">
+                      <strong class="chem-num" id="sn-n-val">1.35 g/kg</strong>
+                      <span class="chem-unit">N (tot)</span>
+                    </div>
+                    <div class="chem-bar"><div class="chem-bar-fill bar-emerald" id="sn-n-bar" style="width:65%;"></div></div>
+                  </div>
+
+                  <div class="chem-card">
+                    <div class="chem-card-head">
+                      <span>Soil pH (H₂O)</span>
+                      <span class="badge-mini" id="sn-ph-badge">Optimal (6.8)</span>
+                    </div>
+                    <div class="chem-card-val-row">
+                      <strong class="chem-num" id="sn-ph-val">6.8 pH</strong>
+                      <span class="chem-unit">Acidity</span>
+                    </div>
+                    <div class="chem-bar"><div class="chem-bar-fill bar-blue" id="sn-ph-bar" style="width:68%;"></div></div>
+                  </div>
+
+                  <div class="chem-card">
+                    <div class="chem-card-head">
+                      <span>Cation Buffer (CEC)</span>
+                      <span class="badge-mini" id="sn-cec-badge">Good K+ Buffer</span>
+                    </div>
+                    <div class="chem-card-val-row">
+                      <strong class="chem-num" id="sn-cec-val">18.5 cmol/kg</strong>
+                      <span class="chem-unit">CEC</span>
+                    </div>
+                    <div class="chem-bar"><div class="chem-bar-fill bar-purple" id="sn-cec-bar" style="width:72%;"></div></div>
+                  </div>
+
+                  <div class="chem-card">
+                    <div class="chem-card-head">
+                      <span>C:N Stoichiometry</span>
+                      <span class="badge-mini" id="sn-cn-badge">Balanced (11.8)</span>
+                    </div>
+                    <div class="chem-card-val-row">
+                      <strong class="chem-num" id="sn-cn-val">11.8</strong>
+                      <span class="chem-unit">SOC / N</span>
+                    </div>
+                    <div class="chem-bar"><div class="chem-bar-fill bar-amber" id="sn-cn-bar" style="width:60%;"></div></div>
+                  </div>
+                </div>
+
+                <!-- Fertilizer Guidance -->
+                <div class="nutrient-advice-minimal" id="nutrient-advice-box">
+                  <div class="na-item">
+                    <span>🧪 <strong>Phosphorus Status:</strong> <span id="sn-p-text">Peak Soluble Orthophosphate (optimal pH).</span></span>
+                  </div>
+                  <div class="na-item">
+                    <span>🌾 <strong>Potassium Buffer:</strong> <span id="sn-k-text">Strong cation capacity prevents rapid leaching.</span></span>
+                  </div>
+                  <div class="na-item" id="sn-custom-advice-row">
+                    <span>💡 <strong>Agronomic Guidance:</strong> <span id="sn-custom-advice">Balanced profile: Standard crop feeding schedule recommended.</span></span>
+                  </div>
                 </div>
               </div>
 
-              <!-- Daily Water Balance Ledger (Interactive Table) -->
-              <div class="verbose-card-brutal">
-                <div class="vc-header-brutal">
-                  <div style="display:flex;align-items:center;gap:10px;">
-                    <span class="vc-icon">📋</span>
+              <!-- Irrigation Events -->
+              <div class="irrigation-card-minimal">
+                <div class="icm-header">
+                  <span>💧 Recent Irrigation Events</span>
+                  <button id="add-irrigation" class="btn-minimal btn-outline btn-xs">+ Add Record</button>
+                </div>
+                <div id="irrigation-list" class="irrigation-list-minimal">
+                  <span class="irr-empty">No irrigation events logged yet</span>
+                </div>
+              </div>
+
+              <!-- Primary Action Button -->
+              <button id="analyze-btn" class="btn-minimal btn-black btn-xl btn-full">
+                <span>Run Crop Water Stress Analysis ➔</span>
+              </button>
+
+            </div>
+
+            <!-- State 2: Stepper Loading Panel -->
+            <div id="loading-panel" style="display:none;" class="loading-panel-minimal">
+              <div class="stepper-card-minimal">
+                <div class="stepper-header-minimal">
+                  <span class="stepper-badge">Computational Pipeline</span>
+                  <h3 class="stepper-title-serif">Executing Physics Engine</h3>
+                </div>
+                <div class="stepper-items-list">
+                  <div class="stepper-step" id="step-weather">
+                    <span class="step-badge-num">1</span>
+                    <span>Fetching Open-Meteo High-Resolution 90d + 7d Weather Vectors</span>
+                  </div>
+                  <div class="stepper-step" id="step-soil">
+                    <span class="step-badge-num">2</span>
+                    <span>Querying ISRIC SoilGrids 250m Global Physical & Chemical Layers</span>
+                  </div>
+                  <div class="stepper-step" id="step-satellite">
+                    <span class="step-badge-num">3</span>
+                    <span>Retrieving NASA MODIS Multi-Spectral NDVI Canopy Reflectance</span>
+                  </div>
+                  <div class="stepper-step" id="step-model">
+                    <span class="step-badge-num">4</span>
+                    <span>Executing FAO-56 Single-Bucket Conservation of Mass Simulation</span>
+                  </div>
+                  <div class="stepper-step" id="step-crossval">
+                    <span class="step-badge-num">5</span>
+                    <span>Running Dual-Source Anomaly Cross-Validation Matrix</span>
+                  </div>
+                  <div class="stepper-step" id="step-advisory">
+                    <span class="step-badge-num">6</span>
+                    <span>Computing FAO-33 Stage Yield Loss & Net Deficit Prescription</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- State 3: Analytics & Results Suite -->
+            <div id="results-panel" style="display:none;" class="results-suite-minimal">
+              
+              <!-- Report Field Meta -->
+              <div class="results-meta-header">
+                <div>
+                  <span class="rmh-tag">PARCEL WATER AUDIT</span>
+                  <span class="rmh-title" id="results-field-meta">—</span>
+                </div>
+                <div class="rmh-sowing">
+                  <span>PLANTED:</span>
+                  <strong id="results-sowing-date">—</strong>
+                </div>
+              </div>
+
+              <!-- Advisory Hero Banner -->
+              <div class="advisory-banner-minimal" id="advisory-banner">
+                <div class="abm-left">
+                  <div class="abm-icon" id="advisory-icon">
+                    <!-- Injected dynamically -->
+                  </div>
+                  <div>
+                    <h2 id="advisory-headline">ANALYZING...</h2>
+                    <p id="advisory-subtext">Processing physical simulation...</p>
+                  </div>
+                </div>
+                <div class="abm-right">
+                  <div class="abm-stat">
+                    <span class="stat-caption">WATER NEEDED IN</span>
+                    <span class="stat-number" id="days-to-stress-val">—</span>
+                  </div>
+                  <div class="abm-stat">
+                    <span class="stat-caption">ESTIMATED YIELD LOSS</span>
+                    <span class="stat-number text-amber" id="yield-loss-val">—</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4 Minimal Metric Cards -->
+              <div class="metrics-grid-minimal">
+                <div class="metric-box-minimal">
+                  <span class="mbm-caption">SOIL WATER NOW</span>
+                  <span class="mbm-num" id="mc-soil-water">—</span>
+                  <div class="mbm-progress"><div class="mbm-bar" id="mc-soil-bar" style="width:0%"></div></div>
+                  <span class="mbm-hint" id="mc-soil-hint">—</span>
+                </div>
+
+                <div class="metric-box-minimal">
+                  <span class="mbm-caption">SAFE LEVEL (RAW)</span>
+                  <span class="mbm-num" id="mc-safe-level">—</span>
+                  <div class="mbm-progress"><div class="mbm-bar" id="mc-safe-bar" style="width:0%"></div></div>
+                  <span class="mbm-hint" id="mc-safe-hint">—</span>
+                </div>
+
+                <div class="metric-box-minimal">
+                  <span class="mbm-caption">RAIN (NEXT 7 DAYS)</span>
+                  <span class="mbm-num" id="mc-rain-expected">—</span>
+                  <span class="mbm-hint" id="mc-rain-hint" style="margin-top:14px;">—</span>
+                </div>
+
+                <div class="metric-box-minimal">
+                  <span class="mbm-caption">CROP ET (NEXT 7 DAYS)</span>
+                  <span class="mbm-num" id="mc-crop-et">—</span>
+                  <span class="mbm-hint" id="mc-et-hint" style="margin-top:14px;">—</span>
+                </div>
+              </div>
+
+              <!-- Charts Grid Row 1 -->
+              <div class="charts-row-minimal">
+                <div class="chart-panel-minimal">
+                  <div class="cpm-header">
                     <div>
-                      <h4 class="vc-title">Daily Water Balance Audit Ledger</h4>
-                      <span class="vc-sub">Complete historical and 7-day forecast daily model calculations</span>
+                      <h3 class="cpm-title">💧 Root-Zone Soil Water Dynamics</h3>
+                      <span class="cpm-sub">Daily water storage vs RAW threshold & Field Capacity</span>
+                    </div>
+                    <span class="cpm-badge">FAO-56 Dual Kc</span>
+                  </div>
+                  <div class="chart-wrap-minimal">
+                    <canvas id="moisture-chart"></canvas>
+                  </div>
+                </div>
+
+                <div class="chart-panel-minimal">
+                  <div class="cpm-header">
+                    <div>
+                      <h3 class="cpm-title">📊 Water Inflows vs Outflows</h3>
+                      <span class="cpm-sub">Rain & Irrigation Inflow vs Crop ET & Deep Drainage Outflow</span>
+                    </div>
+                    <span class="cpm-badge">Water Budget</span>
+                  </div>
+                  <div class="chart-wrap-minimal">
+                    <canvas id="inflow-outflow-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Charts Grid Row 2 -->
+              <div class="charts-row-minimal">
+                <div class="chart-panel-minimal">
+                  <div class="cpm-header">
+                    <div>
+                      <h3 class="cpm-title">🌾 Crop Water Demand (ETc) & Kc Progression</h3>
+                      <span class="cpm-sub">Actual Crop ET (ETc) vs Reference ET (ET₀) across growth stages</span>
+                    </div>
+                    <span class="cpm-badge">Crop Evapotranspiration</span>
+                  </div>
+                  <div class="chart-wrap-minimal">
+                    <canvas id="etc-demand-chart"></canvas>
+                  </div>
+                </div>
+
+                <div class="chart-panel-minimal">
+                  <div class="cpm-header">
+                    <div>
+                      <h3 class="cpm-title">🛰️ Satellite Vegetation Signal (MODIS NDVI)</h3>
+                      <span class="cpm-sub">Canopy greenness & biomass trend cross-validated against model</span>
+                    </div>
+                    <span class="cpm-badge" id="sat-status-pill">Satellite Validated</span>
+                  </div>
+                  <div class="sat-inline-card">
+                    <div class="sat-icon" id="sat-icon-wrap">🛰️</div>
+                    <div>
+                      <strong id="sat-headline" style="font-size:0.9rem;display:block;">Analyzing satellite data...</strong>
+                      <span id="sat-description" style="font-size:0.8rem;color:#6b7280;">—</span>
                     </div>
                   </div>
-                  <span id="ledger-rows-count" class="ledger-count-pill">97 days logged</span>
-                </div>
-                <div class="ledger-table-wrap-brutal">
-                  <table class="ledger-table-brutal" id="daily-ledger-table">
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Stage</th>
-                        <th>ET₀ (mm)</th>
-                        <th>Kc</th>
-                        <th>ETc (mm)</th>
-                        <th>Rain (mm)</th>
-                        <th>Irrig (mm)</th>
-                        <th>Moisture (mm)</th>
-                        <th>RAW Limit</th>
-                        <th>Ks Coeff</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody id="daily-ledger-body">
-                      <!-- Populated dynamically -->
-                    </tbody>
-                  </table>
+                  <div class="chart-wrap-minimal chart-wrap-sm">
+                    <canvas id="ndvi-chart"></canvas>
+                  </div>
                 </div>
               </div>
+
+              <!-- Charts Grid Row 3 -->
+              <div class="charts-row-minimal">
+                <div class="chart-panel-minimal">
+                  <div class="cpm-header">
+                    <div>
+                      <h3 class="cpm-title">🧪 Soil Fertility & Chemical Balance Radar</h3>
+                      <span class="cpm-sub">ISRIC SoilGrids N, P, K Buffer, pH, SOC & C:N balance web</span>
+                    </div>
+                    <span class="cpm-badge">Nutrient Web</span>
+                  </div>
+                  <div class="chart-wrap-minimal chart-wrap-sm">
+                    <canvas id="nutrient-radar-chart"></canvas>
+                  </div>
+                </div>
+
+                <div class="chart-panel-minimal">
+                  <div class="cpm-header">
+                    <div>
+                      <h3 class="cpm-title">🌡️ Thermal Microclimate & Heat-Stress Curve</h3>
+                      <span class="cpm-sub">Daily Max/Min Temperatures & Vapor Pressure Deficit (VPD)</span>
+                    </div>
+                    <span class="cpm-badge">Agro-Meteorology</span>
+                  </div>
+                  <div class="chart-wrap-minimal chart-wrap-sm">
+                    <canvas id="climate-temp-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cross-Validation & Yield Stage -->
+              <div class="charts-row-minimal">
+                <div class="chart-panel-minimal">
+                  <div class="cpm-header">
+                    <div>
+                      <h3 class="cpm-title">🔀 Multi-Source Cross-Validation Matrix</h3>
+                      <span class="cpm-sub">Physics model vs Satellite NDVI sensor anomaly agreement</span>
+                    </div>
+                    <span class="cpm-badge" id="cv-badge-tag">Confidence: 92%</span>
+                  </div>
+                  <div id="cv-matrix" class="cv-matrix-wrap-minimal"></div>
+                  <div id="cv-details" class="cv-details-text-minimal"></div>
+                </div>
+
+                <div class="chart-panel-minimal">
+                  <div class="cpm-header">
+                    <div>
+                      <h3 class="cpm-title">⚠️ Yield-Loss Sensitivity by Growth Stage</h3>
+                      <span class="cpm-sub">FAO-33 yield reduction risk based on stage-specific Ky factors</span>
+                    </div>
+                    <span class="cpm-badge">FAO-33 Ky</span>
+                  </div>
+                  <div class="chart-wrap-minimal chart-wrap-sm">
+                    <canvas id="yield-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Verbose Analytics Section -->
+              <div class="verbose-suite-minimal">
+                
+                <!-- Phenology Growth Stage Timeline -->
+                <div class="verbose-card-minimal">
+                  <div class="vcm-header">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                      <span class="vcm-icon">🌱</span>
+                      <div>
+                        <h4 class="vcm-title">Phenological Crop Growth Stage Timeline</h4>
+                        <span class="vcm-sub">Stage durations, rooting progression (Zr), and water stress sensitivity</span>
+                      </div>
+                    </div>
+                    <span class="vcm-badge" id="pheno-current-stage">Day 90 / 120</span>
+                  </div>
+                  <div class="pheno-timeline-minimal" id="pheno-timeline-container">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+
+                <!-- Deep Soil Diagnostics Grid -->
+                <div class="verbose-card-minimal">
+                  <div class="vcm-header">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                      <span class="vcm-icon">🔬</span>
+                      <div>
+                        <h4 class="vcm-title">Comprehensive Soil Physical & Chemical Diagnostic</h4>
+                        <span class="vcm-sub">ISRIC SoilGrids 250m global root-zone pedotransfer calculations</span>
+                      </div>
+                    </div>
+                    <span class="vcm-badge">ISRIC v2.0 Global</span>
+                  </div>
+                  <div class="soil-diagnostics-grid-minimal" id="verbose-soil-grid">
+                    <!-- Populated dynamically -->
+                  </div>
+                </div>
+
+                <!-- Daily Water Balance Audit Ledger Table -->
+                <div class="verbose-card-minimal">
+                  <div class="vcm-header">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                      <span class="vcm-icon">📋</span>
+                      <div>
+                        <h4 class="vcm-title">Daily Water Balance Audit Ledger</h4>
+                        <span class="vcm-sub">Complete historical and 7-day forecast daily model calculations</span>
+                      </div>
+                    </div>
+                    <span id="ledger-rows-count" class="vcm-badge">97 days logged</span>
+                  </div>
+                  <div class="ledger-table-wrap-minimal">
+                    <table class="ledger-table-minimal" id="daily-ledger-table">
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Stage</th>
+                          <th>ET₀ (mm)</th>
+                          <th>Kc</th>
+                          <th>ETc (mm)</th>
+                          <th>Rain (mm)</th>
+                          <th>Irrig (mm)</th>
+                          <th>Moisture (mm)</th>
+                          <th>RAW Limit</th>
+                          <th>Ks Coeff</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody id="daily-ledger-body">
+                        <!-- Populated dynamically -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Action Cards Row -->
+              <div class="action-cards-row-minimal">
+                <div class="action-card-minimal" id="action-forecast">
+                  <div class="acm-icon">📅</div>
+                  <div class="acm-text">
+                    <strong>7-Day Weather & Stress Forecast</strong>
+                    <span>See daily rainfall & stress projection breakdown</span>
+                  </div>
+                  <span class="acm-arrow">➔</span>
+                </div>
+                <div class="action-card-minimal" id="action-irrigation">
+                  <div class="acm-icon">💧</div>
+                  <div class="acm-text">
+                    <strong>Add Irrigation Plan</strong>
+                    <span>Simulate custom water additions</span>
+                  </div>
+                  <span class="acm-arrow">➔</span>
+                </div>
+                <div class="action-card-minimal" id="action-data">
+                  <div class="acm-icon">🛰️</div>
+                  <div class="acm-text">
+                    <strong>Data Sources & Quality Audit</strong>
+                    <span>Inspect ISRIC, Open-Meteo & MODIS provenance</span>
+                  </div>
+                  <span class="acm-arrow">➔</span>
+                </div>
+              </div>
+
+              <!-- 7-day forecast expandable -->
+              <div id="forecast-section" class="expandable-section-minimal" style="display:none;">
+                <div class="chart-panel-minimal">
+                  <h3 class="cpm-title">7-Day Weather & Stress Projection</h3>
+                  <div class="chart-wrap-minimal">
+                    <canvas id="forecast-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Data Quality expandable -->
+              <div id="dq-section" class="expandable-section-minimal" style="display:none;">
+                <div class="chart-panel-minimal">
+                  <h3 class="cpm-title">Data Sources & Quality Provenance</h3>
+                  <div id="data-quality-grid" class="dq-grid-minimal"></div>
+                </div>
+              </div>
+
+              <!-- Warnings -->
+              <div id="warnings-section" style="display:none;" class="warnings-card-minimal">
+                <ul id="warnings-list" class="warnings-list-minimal"></ul>
+              </div>
+
+              <!-- Minimal Footer -->
+              <footer class="minimal-footer">
+                <div class="footer-top">
+                  <span class="brand-name-serif">COGNITIA<sup>®</sup></span>
+                  <div class="footer-badges">
+                    <span>FAO-56 Certified Physics</span>
+                    <span>ISRIC SoilGrids 250m</span>
+                    <span>NASA MODIS Telemetry</span>
+                  </div>
+                </div>
+                <p class="footer-copy">Better Information. Healthier Crops. Brighter Tomorrows.</p>
+              </footer>
+
             </div>
 
-            <!-- Action Cards -->
-            <div class="action-cards-grid-brutal">
-              <div class="action-card-brutal ac-yellow" id="action-forecast">
-                <span class="ac-icon-brutal">📅</span>
-                <div class="ac-text">
-                  <strong>7-Day Weather & Stress Forecast</strong>
-                  <span>See daily rainfall & stress projection breakdown</span>
-                </div>
-                <span class="ac-arrow">➔</span>
-              </div>
-              <div class="action-card-brutal ac-cyan" id="action-irrigation">
-                <span class="ac-icon-brutal">💧</span>
-                <div class="ac-text">
-                  <strong>Add Irrigation Plan</strong>
-                  <span>Simulate custom water additions</span>
-                </div>
-                <span class="ac-arrow">➔</span>
-              </div>
-              <div class="action-card-brutal ac-pink" id="action-data">
-                <span class="ac-icon-brutal">🛰️</span>
-                <div class="ac-text">
-                  <strong>Data Sources & Quality Audit</strong>
-                  <span>Inspect ISRIC, Open-Meteo & MODIS provenance</span>
-                </div>
-                <span class="ac-arrow">➔</span>
-              </div>
-            </div>
+          </main>
+        </div>
 
-            <!-- 7-day forecast expandable -->
-            <div id="forecast-section" class="forecast-section-brutal" style="display:none;">
-              <div class="chart-card-brutal">
-                <h3 class="ccb-title">7-Day Weather & Stress Projection</h3>
-                <div class="chart-canvas-wrap">
-                  <canvas id="forecast-chart"></canvas>
-                </div>
-              </div>
-            </div>
-
-            <!-- Data Quality expandable -->
-            <div id="dq-section" class="dq-section-brutal" style="display:none;">
-              <div class="chart-card-brutal">
-                <h3 class="ccb-title">Data Sources & Quality Provenance</h3>
-                <div id="data-quality-grid" class="dq-grid-brutal"></div>
-              </div>
-            </div>
-
-            <!-- Warnings -->
-            <div id="warnings-section" style="display:none;" class="warnings-card-brutal">
-              <ul id="warnings-list" class="warnings-list-brutal"></ul>
-            </div>
-
-            <!-- Footer Stamp -->
-            <footer class="footer-brutal">
-              <div class="fb-stamp-row">
-                <span class="fb-stamp">COGNITIA AGRO-INTELLIGENCE</span>
-                <span class="fb-stamp">FAO-56 CERTIFIED PHYSICS</span>
-                <span class="fb-stamp">ISRIC SOILGRIDS 250M</span>
-              </div>
-              <p>Better Information. Healthier Crops. Brighter Tomorrows.</p>
-            </footer>
-
-          </div>
-
-        </main>
       </div>
     </section>
 
   </div>
 
   <!-- Toast Notification Container -->
-  <div id="toast-container" class="toast-container-brutal"></div>
+  <div id="toast-container" class="toast-container-minimal"></div>
 
   <!-- App Entry Script -->
   <script type="module" src="./src/main.js"></script>
