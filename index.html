@@ -114,49 +114,168 @@
       </div>
     </header>
 
-    <!-- ===== SECTION 1: EDITORIAL HERO (MINIMAL SAAS) ===== -->
-    <section id="hero" class="minimal-hero-section">
-      <div class="hero-content-wrap">
+    <!-- ===== SECTION 1: MINIMALIST SAAS SHOWCASE HERO (REFERENCE DESIGN) ===== -->
+    <section id="hero" class="minimal-showcase-section">
+      <div class="showcase-content-wrap">
         
-        <!-- Pill Tag -->
-        <div class="hero-top-badge">
-          <span class="badge-dot"></span>
-          <span>Zero-Hardware Crop Water Stress Intelligence</span>
+        <!-- Micro Pill Tag -->
+        <div class="showcase-micro-tag">
+          <span>001 • AGRO-HYDROLOGY ENGINE</span>
         </div>
 
-        <!-- Headline with Editorial Serif + Sans Combo -->
-        <h1 class="hero-headline-serif">
-          Predict Water Stress <em>Before</em><br />
-          Yield Loss Strikes.
-        </h1>
+        <!-- Main Headline -->
+        <h1 class="showcase-main-title">What We’ve Built</h1>
 
-        <!-- Subheading -->
-        <p class="hero-subtext">
-          We combine <strong>FAO-56 Soil Thermodynamics</strong>, <strong>ISRIC Global SoilGrids 250m</strong>, 
-          and <strong>NASA MODIS Satellite Reflectance</strong> into an explainable, plot-level precision engine.
-        </p>
-
-        <!-- CTA Buttons -->
-        <div class="hero-cta-group">
-          <button class="btn-minimal btn-black btn-lg" onclick="document.getElementById('command-center').scrollIntoView({behavior:'smooth'})">
-            <span>Launch Command Center ↗</span>
+        <!-- 3D Squircle Interactive Showcase Slider Deck -->
+        <div class="showcase-slider-viewport">
+          
+          <!-- Prev Button -->
+          <button id="slider-prev-btn" class="slider-nav-btn btn-prev" title="Previous Feature" aria-label="Previous">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
           </button>
-          <button class="btn-minimal btn-outline btn-lg" onclick="document.getElementById('methodology').scrollIntoView({behavior:'smooth'})">
-            <span>Read Methodology</span>
-          </button>
-        </div>
 
-        <!-- Editorial Stipple Artwork Card (Creation Hand of Ag-Tech) -->
-        <div class="hero-artwork-frame">
-          <img src="./images/minimal_hero_creation.jpg" alt="Minimalist Editorial Agro-Tech Illustration" class="hero-artwork-img" />
-          <div class="artwork-caption-strip">
-            <span class="caption-label">FIGURE 1.0</span>
-            <span class="caption-text">Deterministic Soil Mechanics × Satellite Optical Canopy Telemetry</span>
+          <!-- Slides Container -->
+          <div class="showcase-slides-wrapper" id="showcase-slides-wrapper">
+            
+            <!-- Slide 1: Water Balance Physics -->
+            <div class="showcase-card active" data-slide="0">
+              <div class="card-3d-visual">
+                <img src="./images/minimal_squircle_water.jpg" alt="Matte Squircle with Chrome Water Droplet" class="visual-img" />
+              </div>
+              <div class="card-info-content">
+                <div class="card-brand-header">
+                  <div class="brand-glyph">
+                    <span class="glyph-dot"></span>
+                    <span class="glyph-line"></span>
+                  </div>
+                  <span class="card-brand-title">COGNITIA ENGINE</span>
+                </div>
+                <h3 class="card-title">Physics-Based Root-Zone Water Balance</h3>
+                <p class="card-desc">
+                  We simulate daily soil water depletion, stomatal resistance ($K_s$), and root extraction ($Z_r$) using deterministic FAO-56 mass conservation without in-situ probes.
+                </p>
+                <a href="#methodology" class="card-action-link">
+                  <span>Read Methodology</span>
+                  <span class="link-arrow">➔</span>
+                </a>
+                <div class="card-metrics-row">
+                  <div class="card-metric-col">
+                    <strong class="cmc-num">0 mm</strong>
+                    <span class="cmc-lbl">Probe Hardware</span>
+                  </div>
+                  <div class="card-metric-col">
+                    <strong class="cmc-num">92%</strong>
+                    <span class="cmc-lbl">Sensor Agreement</span>
+                  </div>
+                  <div class="card-metric-col">
+                    <strong class="cmc-num">250m</strong>
+                    <span class="cmc-lbl">Global Resolution</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 2: Satellite MODIS Cross-Validation -->
+            <div class="showcase-card" data-slide="1">
+              <div class="card-3d-visual">
+                <img src="./images/minimal_squircle_plant.jpg" alt="Matte Squircle with Glowing Crop Sprout" class="visual-img" />
+              </div>
+              <div class="card-info-content">
+                <div class="card-brand-header">
+                  <div class="brand-glyph">
+                    <span class="glyph-dot" style="background:#059669;"></span>
+                    <span class="glyph-line" style="background:#059669;"></span>
+                  </div>
+                  <span class="card-brand-title">NASA MODIS TERRA</span>
+                </div>
+                <h3 class="card-title">Multi-Spectral Satellite Cross-Validation</h3>
+                <p class="card-desc">
+                  Cross-references thermodynamic soil stress against satellite optical canopy NDVI reflectance in a $2\times2$ matrix to distinguish true water deficits from disease or pests.
+                </p>
+                <a href="#command-center" class="card-action-link">
+                  <span>Launch Satellite Cross-Validation</span>
+                  <span class="link-arrow">➔</span>
+                </a>
+                <div class="card-metrics-row">
+                  <div class="card-metric-col">
+                    <strong class="cmc-num">16-Day</strong>
+                    <span class="cmc-lbl">Satellite Cadence</span>
+                  </div>
+                  <div class="card-metric-col">
+                    <strong class="cmc-num">100%</strong>
+                    <span class="cmc-lbl">Mass Conserved</span>
+                  </div>
+                  <div class="card-metric-col">
+                    <strong class="cmc-num">FAO-33</strong>
+                    <span class="cmc-lbl">Yield Sensitivity</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 3: ISRIC SoilGrids Pedotransfer -->
+            <div class="showcase-card" data-slide="2">
+              <div class="card-3d-visual">
+                <img src="./images/minimal_hero_creation.jpg" alt="Global SoilGrids Creation Art" class="visual-img" />
+              </div>
+              <div class="card-info-content">
+                <div class="card-brand-header">
+                  <div class="brand-glyph">
+                    <span class="glyph-dot" style="background:#7c3aed;"></span>
+                    <span class="glyph-line" style="background:#7c3aed;"></span>
+                  </div>
+                  <span class="card-brand-title">ISRIC SOILGRIDS 2.0</span>
+                </div>
+                <h3 class="card-title">Machine Learning Pedotransfer Mechanics</h3>
+                <p class="card-desc">
+                  Retrieves global ML-calibrated physical & chemical soil profiles (Sand, Silt, Clay, SOC, Nitrogen, pH, CEC) to determine exact Field Capacity ($FC$) and Wilting Point ($PWP$).
+                </p>
+                <a href="#command-center" class="card-action-link">
+                  <span>Inspect Soil Mechanics</span>
+                  <span class="link-arrow">➔</span>
+                </a>
+                <div class="card-metrics-row">
+                  <div class="card-metric-col">
+                    <strong class="cmc-num">6 Depths</strong>
+                    <span class="cmc-lbl">0–60 cm Harmonized</span>
+                  </div>
+                  <div class="card-metric-col">
+                    <strong class="cmc-num">340 mm/m</strong>
+                    <span class="cmc-lbl">Field Capacity</span>
+                  </div>
+                  <div class="card-metric-col">
+                    <strong class="cmc-num">0–14 pH</strong>
+                    <span class="cmc-lbl">Nutrient Buffer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
+
+          <!-- Next Button -->
+          <button id="slider-next-btn" class="slider-nav-btn btn-next" title="Next Feature" aria-label="Next">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+
+        </div>
+
+        <!-- Pagination Indicator Dots -->
+        <div class="showcase-pagination" id="showcase-pagination">
+          <button class="pag-dot active" data-index="0" aria-label="Slide 1"></button>
+          <button class="pag-dot" data-index="1" aria-label="Slide 2"></button>
+          <button class="pag-dot" data-index="2" aria-label="Slide 3"></button>
+        </div>
+
+        <!-- Floating Bottom Action Button -->
+        <div class="showcase-action-wrap">
+          <button class="btn-minimal btn-black btn-lg showcase-cta-glow" onclick="document.getElementById('command-center').scrollIntoView({behavior:'smooth'})">
+            <span>Explore All Agro Features ➔</span>
+          </button>
         </div>
 
         <!-- Trusted Authorities Strip -->
-        <div class="authorities-strip">
+        <div class="authorities-strip" style="margin-top: 40px;">
           <span class="authorities-title">POWERED BY GLOBAL SCIENTIFIC DATA INFRASTRUCTURE</span>
           <div class="authorities-logos">
             <span class="auth-pill">🇺🇳 FAO Penman–Monteith</span>

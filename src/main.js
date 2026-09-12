@@ -65,6 +65,7 @@ let currentSoilData = null;
 
 // === Initialize ===
 function init() {
+  initShowcaseSlider();
   initMap();
   initMapTools();
   initDrawToolbar();
@@ -95,6 +96,79 @@ function init() {
   setTimeout(() => {
     document.getElementById('loading-screen')?.classList.add('hidden');
   }, 600);
+}
+
+// === Showcase Slider Controller ===
+function initShowcaseSlider() {
+  const cards = document.querySelectorAll('.showcase-card');
+  const dots = document.querySelectorAll('.pag-dot');
+  const prevBtn = document.getElementById('slider-prev-btn');
+  const nextBtn = document.getElementById('slider-next-btn');
+  const wrapper = document.getElementById('showcase-slides-wrapper');
+  if (!cards.length) return;
+
+  let currentSlide = 0;
+  const totalSlides = cards.length;
+  let autoTimer = null;
+
+  function updateSlider(index) {
+    currentSlide = (index + totalSlides) % totalSlides;
+    cards.forEach((c, i) => {
+      c.classList.remove('active', 'prev', 'next');
+      if (i === currentSlide) {
+        c.classList.add('active');
+      } else if (i === (currentSlide - 1 + totalSlides) % totalSlides) {
+        c.classList.add('prev');
+      } else if (i === (currentSlide + 1) % totalSlides) {
+        c.classList.add('next');
+      }
+    });
+
+    dots.forEach((d, i) => {
+      d.classList.toggle('active', i === currentSlide);
+    });
+  }
+
+  function startAuto() {
+    stopAuto();
+    autoTimer = setInterval(() => {
+      updateSlider(currentSlide + 1);
+    }, 6000);
+  }
+
+  function stopAuto() {
+    if (autoTimer) clearInterval(autoTimer);
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      updateSlider(currentSlide - 1);
+      startAuto();
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      updateSlider(currentSlide + 1);
+      startAuto();
+    });
+  }
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const idx = parseInt(dot.getAttribute('data-index') || '0', 10);
+      updateSlider(idx);
+      startAuto();
+    });
+  });
+
+  if (wrapper) {
+    wrapper.addEventListener('mouseenter', stopAuto);
+    wrapper.addEventListener('mouseleave', startAuto);
+  }
+
+  updateSlider(0);
+  startAuto();
 }
 
 // === Map Initialization with Google Hybrid Satellite & Multi-Layers ===
